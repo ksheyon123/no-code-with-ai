@@ -27,32 +27,18 @@ const Main: React.FC = () => {
     },
   ];
 
-  const recursiveRenderer = (item: Item) => {
+  const renderer = (item: Item) => {
+    const { label } = item;
     return (
-      <>
-        {!!item.items && (
-          <Drawer>
-            <List
-              {...item}
-              itemRenderer={(props) => (
-                <>
-                  {props.items && (
-                    <Drawer>
-                      <List {...props} />
-                    </Drawer>
-                  )}
-                </>
-              )}
-            />
-          </Drawer>
-        )}
-      </>
+      <Drawer title={label}>
+        <List {...item} itemRenderer={renderer} />
+      </Drawer>
     );
   };
 
   return (
     <div className="main">
-      <List items={items} itemRenderer={recursiveRenderer} />
+      <List items={items} itemRenderer={renderer} />
     </div>
   );
 };

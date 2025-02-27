@@ -20,7 +20,7 @@ const List: React.FC<IListProps> = ({ items = [], itemRenderer }) => {
         const { id, label } = item;
         return (
           <li key={id + idx}>
-            <span>{label}</span>
+            {!itemRenderer && <span>{label}</span>}
             {!!itemRenderer && itemRenderer(item)}
           </li>
         );

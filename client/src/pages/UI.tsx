@@ -1,14 +1,15 @@
 import React from "react";
-import { FaReact } from "react-icons/fa";
+
+import List from "@/components/common/List/List";
+import { sampleListData } from "@/constants/sample";
 
 const UI: React.FC = () => {
   return (
     <div className="ui-page">
       <h1>UI 페이지</h1>
-      <div className="icon-container">
-        <FaReact size={50} color="#61DAFB" />
-        <p>React Icons 예시</p>
-      </div>
+      <section>
+        <List items={sampleListData} />
+      </section>
     </div>
   );
 };

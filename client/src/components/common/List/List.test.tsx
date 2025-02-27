@@ -46,15 +46,18 @@ describe("List 컴포넌트", () => {
       },
     ];
 
+    const renderer = (item: Item) => {
+      const { label } = item;
+      return (
+        <>
+          <label>{label}</label>
+          <List {...item} itemRenderer={renderer} />
+        </>
+      );
+    };
+
     // 컴포넌트 렌더링
-    render(
-      <List
-        items={nestedItems}
-        itemRenderer={(props) => (
-          <List {...props} itemRenderer={(props) => <List {...props} />} />
-        )}
-      />
-    );
+    render(<List items={nestedItems} itemRenderer={renderer} />);
 
     // 모든 아이템이 화면에 렌더링되었는지 확인
     expect(screen.getByText("부모 아이템 1")).toBeInTheDocument();

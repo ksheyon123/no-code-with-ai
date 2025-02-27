@@ -51,7 +51,7 @@ const Drawer: React.FC<DrawerProps> = ({
         onClick={handleHeaderClick}
       >
         {title && <div className="drawer-title">{title}</div>}
-        <div className="drawer-icon">{isOpen ? "▼" : "▶"}</div>
+        {/* <div className="drawer-icon">{isOpen ? "▼" : "▶"}</div> */}
       </div>
       <div
         data-testid="drawer-content"
