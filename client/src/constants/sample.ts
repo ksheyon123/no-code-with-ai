@@ -1,3 +1,4 @@
+import { DropdownItem } from "@/components/common/Dropdown/Dropdown";
 import { Item } from "@/components/common/List/List";
 
 const sampleListData: Item[] = [
@@ -25,4 +26,18 @@ const sampleListData: Item[] = [
   },
 ];
 
-export { sampleListData };
+const sampleDropdownData: DropdownItem[] = [
+  {
+    id: "1",
+    label: "옵션 1",
+  },
+  {
+    id: "2",
+    label: "옵션 2",
+  },
+  {
+    id: "3",
+    label: "옵션 3",
+  },
+];
+export { sampleListData, sampleDropdownData };

@@ -2,7 +2,9 @@ import React from "react";
 
 import List from "@/components/common/List/List";
 import Drawer from "@/components/common/Drawer/Drawer";
-import { sampleListData } from "@/constants/sample";
+import Dropdown from "@/components/common/Dropdown/Dropdown";
+
+import { sampleListData, sampleDropdownData } from "@/constants/sample";
 
 const UI: React.FC = () => {
   return (
@@ -16,6 +18,11 @@ const UI: React.FC = () => {
       <section>
         <h2>Drawer</h2>
         <Drawer title={"Open it!"} children={<div>Hello</div>} />
+      </section>
+
+      <section>
+        <h2>Dropdown</h2>
+        <Dropdown items={sampleDropdownData} onClick={() => {}} />
       </section>
     </div>
   );
