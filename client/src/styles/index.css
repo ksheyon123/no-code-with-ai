@@ -12,3 +12,41 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* 기본적으로 모든 div에 pointer-events 활성화 */
+div {
+  pointer-events: auto;
+}
+
+/* 모든 div에 hover 효과 제거 */
+div:hover {
+  outline: none;
+}
+
+/* 직접 hover된 div에만 outline 적용 */
+div:hover:not(:has(:hover)) {
+  outline: 1px solid rgba(0, 0, 255, 0.3);
+}
+
+/* 브라우저 호환성을 위한 JavaScript 코드 추가 필요 */
+/* 아래 스크립트를 index.html 또는 별도 JS 파일에 추가해주세요 */
+/*
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('div').forEach(div => {
+    div.addEventListener('mouseover', function(e) {
+      // 모든 div의 outline 제거
+      document.querySelectorAll('div').forEach(d => {
+        d.style.outline = 'none';
+      });
+      
+      // 현재 hover된 div에만 outline 적용
+      if (e.target === div) {
+        div.style.outline = '1px solid rgba(0, 0, 255, 0.3)';
+      }
+      
+      // 이벤트 버블링 중지
+      e.stopPropagation();
+    }, true);
+  });
+});
+*/

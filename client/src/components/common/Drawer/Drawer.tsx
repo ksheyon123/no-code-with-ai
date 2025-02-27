@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export interface DrawerProps {
+export interface IDrawerProps {
   /**
    * Drawer의 제목
    */
@@ -25,7 +25,7 @@ export interface DrawerProps {
  *
  * 클릭 시 열리고 재클릭 시 닫히는 UI 컴포넌트입니다.
  */
-const Drawer: React.FC<DrawerProps> = ({
+const Drawer: React.FC<IDrawerProps> = ({
   title,
   defaultOpen = false,
   className = "",
