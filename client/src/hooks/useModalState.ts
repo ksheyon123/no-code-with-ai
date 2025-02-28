@@ -1,0 +1,3 @@
+const useModalState = () => {
+  return {};
+};

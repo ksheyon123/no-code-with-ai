@@ -1,8 +1,12 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode } from "react";
+import Modal from "@/components/common/Modal/Modal";
+import { useModal } from "@/hooks/useModal";
 
 interface ModalContextType {
   isOpen: boolean;
   modalContent: ReactNode | null;
+  modalState: Record<string, any>;
+  setModalState: React.Dispatch<React.SetStateAction<Record<string, any>>>;
   openModal: (content: ReactNode) => void;
   closeModal: () => void;
 }
@@ -26,30 +30,33 @@ interface ModalContextProviderProps {
 export const ModalContextProvider: React.FC<ModalContextProviderProps> = ({
   children,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<ReactNode | null>(null);
-
-  const openModal = (content: ReactNode) => {
-    setModalContent(content);
-    setIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsOpen(false);
-    // 애니메이션을 위해 약간의 지연 후 content 제거
-    setTimeout(() => {
-      setModalContent(null);
-    }, 300);
-  };
+  const {
+    isOpen,
+    modalContent,
+    modalState,
+    setModalState,
+    openModal,
+    closeModal,
+  } = useModal();
 
   const value = {
     isOpen,
     modalContent,
+    modalState,
+    setModalState,
     openModal,
     closeModal,
   };
 
   return (
-    <ModalContext.Provider value={value}>{children}</ModalContext.Provider>
+    <ModalContext.Provider value={value}>
+      {children}
+      {isOpen && (
+        <Modal isOpen={isOpen} onClose={closeModal}>
+          <Modal.Backdrop onClick={closeModal} />
+          <Modal.Content>{modalContent}</Modal.Content>
+        </Modal>
+      )}
+    </ModalContext.Provider>
   );
 };
