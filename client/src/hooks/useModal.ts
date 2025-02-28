@@ -1,12 +1,27 @@
-import { ReactNode, useState } from "react";
+import { CSSProperties, ReactNode, useState } from "react";
+
+interface ModalOptions {
+  props: any;
+  style?: ModalStyle;
+}
+
+type ModalStyle = {
+  headerStyle?: CSSProperties;
+  contentStyle?: CSSProperties;
+  footerStyle?: CSSProperties;
+};
 
 const useModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode | null>(null);
   const [modalState, setModalState] = useState({});
+  const [modalStyle, setModalStyle] = useState<ModalStyle>({});
 
-  const openModal = (content: ReactNode) => {
+  const openModal = (content: ReactNode, options?: ModalOptions) => {
     setModalContent(content);
+    if (options?.style) {
+      setModalStyle(options?.style);
+    }
     setIsOpen(true);
   };
 
@@ -22,6 +37,7 @@ const useModal = () => {
     modalContent,
     modalState,
     setModalState,
+    modalStyle,
     openModal,
     closeModal,
   };

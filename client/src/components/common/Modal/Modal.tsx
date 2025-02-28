@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import "./Modal.css";
 import { useModalContext } from "@/contexts/ModalContext";
+import "./Modal.css";
 
 // 모달 컴포넌트 Props
 interface ModalProps {
@@ -18,7 +18,6 @@ const Modal: React.FC<ModalProps> & {
   Footer: typeof ModalFooter;
 } = ({ isOpen, onClose, children, className = "" }) => {
   if (!isOpen) return null;
-
   return (
     <div
       className={`modal-container ${className}`}
@@ -53,12 +52,29 @@ const ModalBackdrop: React.FC<BackdropProps> = ({
 interface HeaderProps {
   children: ReactNode;
   className?: string;
+  onClose?: () => void;
+  showCloseButton?: boolean;
 }
 
-const ModalHeader: React.FC<HeaderProps> = ({ children, className = "" }) => {
+const ModalHeader: React.FC<HeaderProps> = ({
+  children,
+  className = "",
+  onClose,
+  showCloseButton = true,
+}) => {
   return (
     <div className={`modal-header ${className}`} data-testid="modal-header">
       {children}
+      {showCloseButton && onClose && (
+        <button
+          className="modal-close-button"
+          onClick={onClose}
+          aria-label="닫기"
+          data-testid="modal-close-button"
+        >
+          ✕
+        </button>
+      )}
     </div>
   );
 };

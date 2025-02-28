@@ -13,18 +13,18 @@ code {
     monospace;
 }
 
-/* 기본적으로 모든 div에 pointer-events 활성화 */
-div {
+/* .main 클래스 내부의 모든 요소에 pointer-events 활성화 */
+.main * {
   pointer-events: auto;
 }
 
-/* 모든 div에 hover 효과 제거 */
-div:hover {
+/* .main 클래스 내부의 모든 요소에 hover 효과 제거 */
+.main *:hover {
   outline: none;
 }
 
-/* 직접 hover된 div에만 outline 적용 */
-div:hover:not(:has(:hover)) {
+/* .main 클래스 내부에서 직접 hover된 요소에만 outline 적용 */
+.main *:hover:not(:has(:hover)) {
   outline: 1px solid rgba(0, 0, 255, 0.3);
 }
 
@@ -32,22 +32,29 @@ div:hover:not(:has(:hover)) {
 /* 아래 스크립트를 index.html 또는 별도 JS 파일에 추가해주세요 */
 /*
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('div').forEach(div => {
-    div.addEventListener('mouseover', function(e) {
-      // 모든 div의 outline 제거
-      document.querySelectorAll('div').forEach(d => {
-        d.style.outline = 'none';
-      });
-      
-      // 현재 hover된 div에만 outline 적용
-      if (e.target === div) {
-        div.style.outline = '1px solid rgba(0, 0, 255, 0.3)';
-      }
-      
-      // 이벤트 버블링 중지
-      e.stopPropagation();
-    }, true);
-  });
+  // .main 클래스 내부의 모든 요소 선택
+  const mainElement = document.querySelector('.main');
+  
+  if (mainElement) {
+    const elements = mainElement.querySelectorAll('*');
+    
+    elements.forEach(element => {
+      element.addEventListener('mouseover', function(e) {
+        // .main 내부의 모든 요소의 outline 제거
+        elements.forEach(el => {
+          el.style.outline = 'none';
+        });
+        
+        // 현재 hover된 요소에만 outline 적용
+        if (e.target === element) {
+          element.style.outline = '1px solid rgba(0, 0, 255, 0.3)';
+        }
+        
+        // 이벤트 버블링 중지
+        e.stopPropagation();
+      }, true);
+    });
+  }
 });
 */
 .main {

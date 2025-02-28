@@ -16,8 +16,9 @@ describe("Modal Component", () => {
 
     render(
       <TestWrapper>
+        {/* Backdrop은 Modal 외부에 렌더링 */}
+        <Modal.Backdrop onClick={handleClose} />
         <Modal isOpen={true} onClose={handleClose}>
-          <Modal.Backdrop onClick={handleClose} />
           <Modal.Content>모달 내용</Modal.Content>
         </Modal>
       </TestWrapper>
@@ -48,8 +49,9 @@ describe("Modal Component", () => {
 
     render(
       <TestWrapper>
+        {/* Backdrop은 Modal 외부에 렌더링 */}
+        <Modal.Backdrop onClick={handleClose} />
         <Modal isOpen={true} onClose={handleClose}>
-          <Modal.Backdrop onClick={handleClose} />
           <Modal.Content>모달 내용</Modal.Content>
         </Modal>
       </TestWrapper>
@@ -74,6 +76,28 @@ describe("Modal Component", () => {
 
     expect(screen.getByText("모달 제목")).toBeInTheDocument();
     expect(screen.getByTestId("modal-header")).toBeInTheDocument();
+  });
+
+  // 모달 헤더의 닫기 버튼 테스트
+  test("calls onClose when close button in header is clicked", () => {
+    const handleClose = jest.fn();
+
+    render(
+      <TestWrapper>
+        <Modal isOpen={true} onClose={handleClose}>
+          <Modal.Header onClose={handleClose} showCloseButton={true}>
+            모달 제목
+          </Modal.Header>
+          <Modal.Content>모달 내용</Modal.Content>
+        </Modal>
+      </TestWrapper>
+    );
+
+    const closeButton = screen.getByTestId("modal-close-button");
+    expect(closeButton).toBeInTheDocument();
+
+    fireEvent.click(closeButton);
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
   // 모달 푸터 렌더링 테스트

@@ -51,12 +51,16 @@ export const ModalContextProvider: React.FC<ModalContextProviderProps> = ({
   return (
     <ModalContext.Provider value={value}>
       {children}
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={closeModal}>
-          <Modal.Backdrop onClick={closeModal} />
-          <Modal.Content>{modalContent}</Modal.Content>
-        </Modal>
-      )}
+      {isOpen && <Modal.Backdrop onClick={closeModal} />}
+      <Modal isOpen={isOpen} onClose={closeModal}>
+        <Modal.Header onClose={closeModal} showCloseButton={true}>
+          <div>Modal Title</div>
+        </Modal.Header>
+        <Modal.Content>{modalContent}</Modal.Content>
+        <Modal.Footer>
+          <button onClick={closeModal}>닫기</button>
+        </Modal.Footer>
+      </Modal>
     </ModalContext.Provider>
   );
 };
