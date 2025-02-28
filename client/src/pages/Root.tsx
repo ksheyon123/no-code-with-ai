@@ -3,24 +3,33 @@ import React, { useEffect, useRef, RefObject } from "react";
 import { Outlet } from "react-router-dom";
 
 const Root: React.FC = () => {
-  const mainRef = useRef<HTMLDivElement>();
   const { openModal } = useModalContext();
-  useEffect(() => {
-    if (mainRef.current) {
-      console.log("Mounted");
-      mainRef.current.addEventListener("click", () => {
-        console.log("CLick");
-        openModal(<></>);
-      });
+  // useEffect(() => {
+  //   // Normal : 추가하기
+  //   // Alt : 안에 넣기
+  //   if (mainRef.current) {
+  //     let x = null;
+  //     let y = null;
+  //     const getCoord = (e: MouseEvent) => {
+  //       const xCoord = e.x;
+  //       const yCoord = e.y;
+  //       x = xCoord;
+  //       y = yCoord;
+  //     };
 
-      return () => mainRef.current?.removeEventListener("click", () => {});
-    }
-  }, [mainRef.current]);
-  return (
-    <div className="main" ref={mainRef as RefObject<HTMLDivElement>}>
-      <Outlet />
-    </div>
-  );
+  //     window.addEventListener("mouseenter", getCoord);
+
+  //     mainRef.current.addEventListener("click", () => {
+  //       openModal(<></>);
+  //     });
+
+  //     return () => {
+  //       mainRef.current?.removeEventListener("click", () => {});
+  //       mainRef.current?.removeEventListener("mouseenter", getCoord);
+  //     };
+  //   }
+  // }, [mainRef.current]);
+  return <Outlet />;
 };
 
 export default Root;
