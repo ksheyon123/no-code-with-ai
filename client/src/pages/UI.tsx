@@ -5,6 +5,8 @@ import Drawer from "@/components/common/Drawer/Drawer";
 import Dropdown from "@/components/common/Dropdown/Dropdown";
 
 import { sampleListData, sampleDropdownData } from "@/constants/sample";
+import InputWrapper from "@/components/common/Input/InputWrapper";
+import Input from "@/components/common/Input/Input";
 
 const UI: React.FC = () => {
   return (
@@ -23,6 +25,13 @@ const UI: React.FC = () => {
       <section>
         <h2>Dropdown</h2>
         <Dropdown items={sampleDropdownData} onClick={() => {}} />
+      </section>
+
+      <section>
+        <h2>Input</h2>
+        <InputWrapper>
+          <Input />
+        </InputWrapper>
       </section>
     </div>
   );
