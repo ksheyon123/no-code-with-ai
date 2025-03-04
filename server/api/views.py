@@ -23,13 +23,15 @@ def init_langchain(request, format=None):
     """
     LangChain 초기화 엔드포인트
     """
-    print("Initialize langchain")
     # 실제 LangChain 초기화 로직 호출
     model = initialize_langchain()
+    print("Initialize LangChain")
+
     return Response({
         'status': 'Success',
         'message': 'LangChain initialized successfully'
     })
+
 
 class ItemViewSet(viewsets.ModelViewSet):
     """
