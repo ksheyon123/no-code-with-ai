@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from .models import Item
 from .serializers import ItemSerializer
-
+from utils.langchain import initialize_langchain
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -17,6 +17,19 @@ def api_root(request, format=None):
         'status': 'API is running',
     })
 
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def init_langchain(request, format=None):
+    """
+    LangChain 초기화 엔드포인트
+    """
+    print("Initialize langchain")
+    # 실제 LangChain 초기화 로직 호출
+    model = initialize_langchain()
+    return Response({
+        'status': 'Success',
+        'message': 'LangChain initialized successfully'
+    })
 
 class ItemViewSet(viewsets.ModelViewSet):
     """
