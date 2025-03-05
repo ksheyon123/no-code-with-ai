@@ -87,35 +87,23 @@ def req_simple_architecture(request, format=None):
     # 실제 LangChain 초기화 로직 호출
 
     print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
-
-    # JsonOutputParser 초기화
-    json_parser = JsonOutputParser()
-    
+    parser = JsonOutputParser()
     # JSON 스키마 형식 정의
-    format_instructions = json_parser.get_format_instructions()
-    
+    format_instructions = '{{"jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
     prompt_template = """
     You are an expert web developer. Create JSX code based on the given architecture.
     
     Architecture: {architecture}
     
+    1. Return Only JSON 
+    2. Return a JSON response with the following structure:
     {format_instructions}
-    
-    Return a JSON response with the following structure:
-    {{
-        "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요",
-        "component_name": "ComponentName",
-        "imports": ["필요한 import 문들"]
-    }}
-    
-    The JSX code should accurately implement the architecture provided.
     """
     
     prompt = set_prompt(prompt_template, ["architecture"], {"format_instructions": format_instructions})
-    
+    print(prompt)
     # 체인 구성
-    chain = prompt | model | json_parser
-    
+    chain = prompt.pipe(model).pipe(parser)
     response = chain.invoke({
         "architecture": architecture,
         "format_instructions": format_instructions

@@ -14,10 +14,16 @@ type ModalStyle = {
 const useModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode | null>(null);
+  const [modalOptions, setModalOptions] = useState<{ [key: string]: any }>({});
   const [modalState, setModalState] = useState({});
   const [modalStyle, setModalStyle] = useState<ModalStyle>({});
 
-  const openModal = (content: ReactNode, options?: ModalOptions) => {
+  const openModal = (
+    content: ReactNode,
+    header?: ReactNode,
+    footer?: ReactNode,
+    options?: ModalOptions
+  ) => {
     setModalContent(content);
     if (options?.style) {
       setModalStyle(options?.style);

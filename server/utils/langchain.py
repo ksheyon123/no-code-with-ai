@@ -62,7 +62,9 @@ def set_prompt(template, input_variables=None, partial_variables=None) :
         partial_variables = {}
         
     return PromptTemplate(
-        template=template
+        template=template,
+        input_variables=input_variables,
+        partial_variables=partial_variables
     )
     
 
