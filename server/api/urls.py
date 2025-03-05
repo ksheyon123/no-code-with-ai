@@ -9,5 +9,5 @@ router.register(r'items', views.ItemViewSet)
 urlpatterns = [
     path('', views.api_root),
     path('', include(router.urls)),
-    path('init_langchain', views.init_langchain)
+    path('langchain/', include('api.langchain.urls')),
 ]

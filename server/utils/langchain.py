@@ -1,6 +1,6 @@
 import os
 from langchain_anthropic import ChatAnthropic
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 
 # settings.py에서 이미 load_dotenv()가 호출되므로 여기서는 생략
 
@@ -13,6 +13,7 @@ def initialize_langchain():
     .env 파일에서 ANTHROPIC_API_KEY를 로드하여 ChatAnthropic 모델을 초기화합니다.
     이미 초기화된 경우 기존 인스턴스를 반환합니다.
     """
+    print('Langchain Model 초기화를 수행합니다...')
     global _langchain_model
     
     # 이미 초기화된 경우 기존 인스턴스 반환
@@ -39,14 +40,29 @@ def get_langchain_model():
         return initialize_langchain()
     return _langchain_model
 
-def set_structured_prompt() :
-    return PromptTemplate.from_messages(
-        ("system", '{systemPrompt}\n\n응답 형식:\n{format_instructions}'),
-        (
-        "user",
-        [
-            { type: "text", message: "{query}" },
-            { type: "image_url", image_url: "data:image/png;base64,{base64}" },
-        ],
+def set_prompt(template, input_variables=None, partial_variables=None) :
+    """
+        PromptTemplate 생성 메소드
+
+        def _get_datetime():
+            now = datetime.now()
+            return now.strftime("%m/%d/%Y, %H:%M:%S")
+
+        prompt = PromptTemplate(
+            template="Tell me a {adjective} joke about the day {date}",
+            input_variables=["adjective"],
+            partial_variables={"date": _get_datetime},
         )
-    ).partial
+        print(prompt.format(adjective="funny"))
+    """
+    # input_variables와 partial_variables 타입 검사 및 기본값 설정
+    if input_variables is None or not isinstance(input_variables, list):
+        input_variables = []
+    if partial_variables is None or not isinstance(partial_variables, dict):
+        partial_variables = {}
+        
+    return PromptTemplate(
+        template=template
+    )
+    
+
