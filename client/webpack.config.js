@@ -45,6 +45,13 @@ module.exports = {
       },
     ],
   },
+  ignoreWarnings: [
+    {
+      module: /babel\.js$/,
+      message:
+        /Critical dependency: the request of a dependency is an expression/,
+    },
+  ],
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/index.html",
