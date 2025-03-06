@@ -55,6 +55,7 @@ interface HeaderProps {
   className?: string;
   onClose?: () => void;
   showCloseButton?: boolean;
+  style?: React.CSSProperties;
 }
 
 const ModalHeader: React.FC<HeaderProps> = ({
@@ -62,9 +63,14 @@ const ModalHeader: React.FC<HeaderProps> = ({
   className = "",
   onClose,
   showCloseButton = true,
+  style,
 }) => {
   return (
-    <div className={`modal-header ${className}`} data-testid="modal-header">
+    <div
+      className={`modal-header ${className}`}
+      data-testid="modal-header"
+      style={style}
+    >
       {children}
       {showCloseButton && onClose && (
         <button
@@ -89,13 +95,22 @@ interface ContentProps {
         setState: React.Dispatch<React.SetStateAction<Record<string, any>>>
       ) => ReactNode);
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const ModalContent: React.FC<ContentProps> = ({ children, className = "" }) => {
+const ModalContent: React.FC<ContentProps> = ({
+  children,
+  className = "",
+  style,
+}) => {
   const { modalState, setModalState } = useModalContext();
 
   return (
-    <div className={`modal-content ${className}`} data-testid="modal-content">
+    <div
+      className={`modal-content ${className}`}
+      data-testid="modal-content"
+      style={style}
+    >
       {typeof children === "function"
         ? children(modalState, setModalState)
         : children}
@@ -107,13 +122,22 @@ const ModalContent: React.FC<ContentProps> = ({ children, className = "" }) => {
 interface FooterProps {
   children: ReactNode | ((state: Record<string, any>) => ReactNode);
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const ModalFooter: React.FC<FooterProps> = ({ children, className = "" }) => {
+const ModalFooter: React.FC<FooterProps> = ({
+  children,
+  className = "",
+  style,
+}) => {
   const { modalState } = useModalContext();
 
   return (
-    <div className={`modal-footer ${className}`} data-testid="modal-footer">
+    <div
+      className={`modal-footer ${className}`}
+      data-testid="modal-footer"
+      style={style}
+    >
       {typeof children === "function" ? children(modalState) : children}
     </div>
   );

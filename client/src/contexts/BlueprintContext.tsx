@@ -29,11 +29,17 @@ interface BlueprintContextProviderProps {
 export const BlueprintContextProvider: React.FC<
   BlueprintContextProviderProps
 > = ({ children }) => {
+  const [targetId, setTargetId] = useState<string>("");
   const [blueprints, setBlueprints] = useState<BluePrintObject | null>(null);
 
-  const updateParentBlueprint = (targetId: string) => {
-    if (blueprints) {
-      findBlueprintById(blueprints, targetId);
+  const updateParentBlueprint = (
+    targetId: string,
+    config: Omit<BluePrintObject, "id">
+  ) => {
+    if (!blueprints || targetId) {
+      // updateBlueprintById();
+    } else {
+      const blueprint = findBlueprintById(blueprints, targetId);
     }
   };
 
