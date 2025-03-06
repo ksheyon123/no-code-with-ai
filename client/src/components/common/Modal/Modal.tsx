@@ -17,6 +17,7 @@ const Modal: React.FC<ModalProps> & {
   Content: typeof ModalContent;
   Footer: typeof ModalFooter;
 } = ({ isOpen, onClose, children, className = "" }) => {
+  const { setModalState } = useModalContext();
   if (!isOpen) return null;
   return (
     <div
