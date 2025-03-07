@@ -1,8 +1,17 @@
 import Dropdown, { DropdownItem } from "@/components/common/Dropdown/Dropdown";
 import { useModalContext } from "@/contexts/ModalContext";
+import { createRandomHash } from "@/utils/crypto";
 import { useEffect } from "react";
 
 const items: DropdownItem[] = [
+  {
+    id: "horizontal",
+    label: "Horizontal",
+  },
+  {
+    id: "vertical",
+    label: "Vertical",
+  },
   {
     id: "input",
     label: "Input",
@@ -17,13 +26,13 @@ const items: DropdownItem[] = [
   },
 ];
 
-const AddComponent = () => {
+const AddComponent = ({ targetId }: any) => {
   const { modalState, setModalState } = useModalContext();
   useEffect(() => {
     setModalState((prev) => {
       return {
         ...prev,
-        type: "input",
+        type: items[0].id,
       };
     });
   }, []);
@@ -32,6 +41,7 @@ const AddComponent = () => {
       <div>
         <label>Component Type</label>
         <Dropdown
+          defaultValue={items[0].id}
           items={items}
           onClick={(e) => {
             const { id } = e;

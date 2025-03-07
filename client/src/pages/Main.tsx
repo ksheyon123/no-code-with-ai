@@ -1,35 +1,47 @@
 import AddComponent from "@/components/common/Form/AddComponent";
+import List from "@/components/common/List/List";
+import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UISelectModalFooter";
+import DOMRenderer from "@/components/dom/DOMRenderer/DOMRenderer";
+import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
+import { createRandomHash } from "@/utils/crypto";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 
 const Main: React.FC = () => {
+  const { blueprints } = useBlueprintContext();
   const { openModal } = useModalContext();
   const mainRef = useRef<HTMLDivElement>(null);
-  const [Component, setComponent] = useState<React.ComponentType | null>(null);
-
-  // React 상태로 메타키 상태 관리
-
   // 키 이벤트 핸들러
   useEffect(() => {
     let isClickable = false;
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log("KeyDown:", e.code);
       if (e.code === "MetaLeft") {
         isClickable = true;
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      console.log("KeyUp:", e.code);
       if (e.code === "MetaLeft") {
         isClickable = false;
       }
     };
 
     const handleMouseDown = (e: MouseEvent) => {
-      console.log("MouseDown, MetaAlt pressed:", isClickable);
       if (isClickable) {
-        openModal(<AddComponent />);
+        const p = document.elementsFromPoint(e.x, e.y);
+        const tagId = p[0].id;
+        const ptagId = p[1].id;
+
+        openModal(
+          <AddComponent parentId={ptagId} targetId={tagId} />,
+          <></>,
+          <UISelectModalFooter />,
+          {
+            useHeader: false,
+            useFooter: true,
+            showNavigationButtons: true,
+          }
+        );
       }
     };
 
@@ -45,14 +57,21 @@ const Main: React.FC = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+
       if (mainRef) {
         mainRef.current?.removeEventListener("mousedown", handleMouseDown);
       }
     };
   }, [mainRef]);
-
+  console.log(blueprints);
   return (
-    <div className="main" ref={mainRef as RefObject<HTMLDivElement>}></div>
+    <div
+      id="main_component"
+      className="main"
+      ref={mainRef as RefObject<HTMLDivElement>}
+    >
+      {blueprints && <DOMRenderer items={blueprints} />}
+    </div>
   );
 };
 
