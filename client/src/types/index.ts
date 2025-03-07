@@ -6,7 +6,7 @@ export type BluePrintObject = {
   description: string;
   tag?: "div" | "ul" | "li";
   label?: string;
-  child?: BluePrintObject | BluePrintObject[];
+  child?: BluePrintObject[];
   attributes?: Record<string, string | number | boolean>;
   style?: Record<string, string | number>;
 };

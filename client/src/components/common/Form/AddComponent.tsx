@@ -2,6 +2,7 @@ import Dropdown, { DropdownItem } from "@/components/common/Dropdown/Dropdown";
 import { useModalContext } from "@/contexts/ModalContext";
 import { createRandomHash } from "@/utils/crypto";
 import { useEffect } from "react";
+import Radio, { RadioGroup } from "../Radio";
 
 const items: DropdownItem[] = [
   {
@@ -26,18 +27,38 @@ const items: DropdownItem[] = [
   },
 ];
 
-const AddComponent = ({ targetId }: any) => {
+const AddComponent = ({ parentId, targetId }: any) => {
   const { modalState, setModalState } = useModalContext();
   useEffect(() => {
     setModalState((prev) => {
       return {
         ...prev,
+        parentId,
+        targetId,
         type: items[0].id,
       };
     });
   }, []);
   return (
-    <div>
+    <div style={{ height: 400 }}>
+      <div>
+        <RadioGroup
+          value={modalState.radioType}
+          onChange={(val) => {
+            setModalState((prev) => {
+              return {
+                ...prev,
+                radioType: val,
+              };
+            });
+          }}
+          name="요소"
+          children={[
+            <Radio label="추가" name="추가" value="0" />,
+            <Radio label="삽입" name="삽입" value="1" />,
+          ]}
+        />
+      </div>
       <div>
         <label>Component Type</label>
         <Dropdown

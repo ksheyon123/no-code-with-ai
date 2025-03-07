@@ -3,7 +3,6 @@ import {
   findBlueprintById,
   findBlueprintByIdBFS,
   findBlueprintWithPath,
-  updateBlueprintById,
   getObjectReference,
   modifyObjectDirectly,
   updateChildDirectly,
@@ -19,13 +18,15 @@ const sampleBlueprint: BluePrintObject = {
       id: "header",
       type: "header",
       description: "헤더 영역",
-      child: {
-        id: "title",
-        type: "h1",
-        description: "제목",
-        child: [],
-        style: { color: "blue" },
-      },
+      child: [
+        {
+          id: "title",
+          type: "h1",
+          description: "제목",
+          child: [],
+          style: { color: "blue" },
+        },
+      ],
     },
     {
       id: "content",
@@ -141,94 +142,6 @@ describe("findBlueprintWithPath", () => {
   test("존재하지 않는 ID에 대해 null을 반환해야 함", () => {
     const result = findBlueprintWithPath(sampleBlueprint, "nonexistent");
     expect(result).toBeNull();
-  });
-});
-
-describe("updateBlueprintById", () => {
-  test("루트 객체를 업데이트할 수 있어야 함", () => {
-    const updatedBlueprint = updateBlueprintById(
-      sampleBlueprint,
-      "root",
-      (obj) => ({
-        ...obj,
-        description: "업데이트된 루트 컨테이너",
-      })
-    );
-
-    expect(updatedBlueprint).not.toBe(sampleBlueprint); // 불변성 체크
-    expect(updatedBlueprint.description).toBe("업데이트된 루트 컨테이너");
-    // 원본은 변경되지 않아야 함
-    expect(sampleBlueprint.description).toBe("루트 컨테이너");
-  });
-
-  test("중첩된 객체를 업데이트할 수 있어야 함", () => {
-    const updatedBlueprint = updateBlueprintById(
-      sampleBlueprint,
-      "title",
-      (obj) => ({
-        ...obj,
-        description: "업데이트된 제목",
-        style: { ...obj.style, fontWeight: "bold" },
-      })
-    );
-
-    const updatedTitle = findBlueprintById(updatedBlueprint, "title");
-    expect(updatedTitle).toBeDefined();
-    expect(updatedTitle?.description).toBe("업데이트된 제목");
-    expect(updatedTitle?.style).toEqual({
-      color: "blue",
-      fontWeight: "bold",
-    });
-
-    // 원본은 변경되지 않아야 함
-    const originalTitle = findBlueprintById(sampleBlueprint, "title");
-    expect(originalTitle?.description).toBe("제목");
-    expect(originalTitle?.style).toEqual({ color: "blue" });
-  });
-
-  test("배열 내의 객체를 업데이트할 수 있어야 함", () => {
-    const updatedBlueprint = updateBlueprintById(
-      sampleBlueprint,
-      "paragraph1",
-      (obj) => ({
-        ...obj,
-        description: "업데이트된 첫 번째 문단",
-        attributes: {
-          ...obj.attributes,
-          "data-updated": true,
-        },
-      })
-    );
-
-    const updatedParagraph = findBlueprintById(updatedBlueprint, "paragraph1");
-    expect(updatedParagraph).toBeDefined();
-    expect(updatedParagraph?.description).toBe("업데이트된 첫 번째 문단");
-    expect(updatedParagraph?.attributes).toEqual({
-      "data-testid": "p1",
-      "data-updated": true,
-    });
-
-    // 원본은 변경되지 않아야 함
-    const originalParagraph = findBlueprintById(sampleBlueprint, "paragraph1");
-    expect(originalParagraph?.description).toBe("첫 번째 문단");
-    expect(originalParagraph?.attributes).toEqual({ "data-testid": "p1" });
-  });
-
-  test("존재하지 않는 ID에 대해 원본과 동일한 구조를 반환해야 함", () => {
-    const updatedBlueprint = updateBlueprintById(
-      sampleBlueprint,
-      "nonexistent",
-      (obj) => ({
-        ...obj,
-        description: "이 업데이트는 적용되지 않아야 함",
-      })
-    );
-
-    // 구조는 같지만 참조는 다름 (불변성)
-    expect(updatedBlueprint).not.toBe(sampleBlueprint);
-    expect(JSON.stringify(updatedBlueprint)).toBe(
-      JSON.stringify(sampleBlueprint)
-    );
   });
 });
 
@@ -365,45 +278,47 @@ describe("복잡한 중첩 구조 테스트", () => {
     id: "app",
     type: "div",
     description: "애플리케이션 루트",
-    child: {
-      id: "layout",
-      type: "div",
-      description: "레이아웃 컨테이너",
-      child: [
-        {
-          id: "sidebar",
-          type: "aside",
-          description: "사이드바",
-          child: [
-            {
-              id: "menu",
-              type: "nav",
-              description: "메뉴",
-              child: [
-                {
-                  id: "menuItem1",
-                  type: "a",
-                  description: "메뉴 항목 1",
-                  child: [],
-                },
-                {
-                  id: "menuItem2",
-                  type: "a",
-                  description: "메뉴 항목 2",
-                  child: [],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "mainContent",
-          type: "main",
-          description: "메인 콘텐츠",
-          child: [],
-        },
-      ],
-    },
+    child: [
+      {
+        id: "layout",
+        type: "div",
+        description: "레이아웃 컨테이너",
+        child: [
+          {
+            id: "sidebar",
+            type: "aside",
+            description: "사이드바",
+            child: [
+              {
+                id: "menu",
+                type: "nav",
+                description: "메뉴",
+                child: [
+                  {
+                    id: "menuItem1",
+                    type: "a",
+                    description: "메뉴 항목 1",
+                    child: [],
+                  },
+                  {
+                    id: "menuItem2",
+                    type: "a",
+                    description: "메뉴 항목 2",
+                    child: [],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: "mainContent",
+            type: "main",
+            description: "메인 콘텐츠",
+            child: [],
+          },
+        ],
+      },
+    ],
   };
 
   test("깊게 중첩된 객체를 DFS로 찾을 수 있어야 함", () => {
@@ -431,24 +346,5 @@ describe("복잡한 중첩 구조 테스트", () => {
       "menu",
       "menuItem1",
     ]);
-  });
-
-  test("깊게 중첩된 객체를 업데이트할 수 있어야 함", () => {
-    const updatedBlueprint = updateBlueprintById(
-      complexBlueprint,
-      "menu",
-      (obj) => ({
-        ...obj,
-        description: "업데이트된 메뉴",
-      })
-    );
-
-    const updatedMenu = findBlueprintById(updatedBlueprint, "menu");
-    expect(updatedMenu).toBeDefined();
-    expect(updatedMenu?.description).toBe("업데이트된 메뉴");
-
-    // 원본은 변경되지 않아야 함
-    const originalMenu = findBlueprintById(complexBlueprint, "menu");
-    expect(originalMenu?.description).toBe("메뉴");
   });
 });

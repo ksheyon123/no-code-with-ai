@@ -1,11 +1,12 @@
 import { BluePrintObject } from "@/types";
-import { findBlueprintById } from "@/utils/blueprint";
+import { findBlueprintById, updateChildDirectly } from "@/utils/blueprint";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface BlueprintContextType {
   blueprints: BluePrintObject | null;
   addBlueprint: Function;
   updateBlueprint: Function;
+  insertBlueprint: Function;
 }
 
 const BlueprintContext = createContext<BlueprintContextType | undefined>(
@@ -41,6 +42,34 @@ export const BlueprintContextProvider: React.FC<
     });
   };
 
+  const insertBlueprint = (
+    targetId: string,
+    parentId: string,
+    config: Omit<BluePrintObject, "id">
+  ) => {
+    if (!!blueprints) {
+      const blueprint = findBlueprintById(blueprints, parentId);
+
+      if (blueprint) {
+        updateChildDirectly(blueprint, targetId, [
+          {
+            id: targetId,
+            ...config,
+          },
+        ]);
+      }
+      if (blueprint?.child) {
+        updateChildDirectly(blueprint, targetId, [
+          ...blueprint.child,
+          {
+            id: targetId,
+            ...config,
+          },
+        ]);
+      }
+    }
+  };
+
   const updateBlueprint = (
     targetId: string,
     config: Omit<BluePrintObject, "id">
@@ -55,6 +84,7 @@ export const BlueprintContextProvider: React.FC<
   const value = {
     addBlueprint,
     updateBlueprint,
+    insertBlueprint,
     blueprints,
   };
 

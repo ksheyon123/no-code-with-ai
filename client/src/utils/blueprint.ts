@@ -52,7 +52,7 @@ export const modifyObjectDirectly = (
 export const updateChildDirectly = (
   blueprint: BluePrintObject,
   targetId: string,
-  newChild: BluePrintObject | BluePrintObject[]
+  newChild: BluePrintObject[]
 ): BluePrintObject | undefined => {
   const foundObject = findBlueprintById(blueprint, targetId);
 
@@ -170,43 +170,4 @@ export const findBlueprintWithPath = (
   }
 
   return findBlueprintWithPath(blueprint.child, targetId, currentPath);
-};
-
-/**
- * 특정 ID를 가진 BluePrintObject를 찾아 업데이트합니다.
- * @param blueprint 업데이트할 BluePrintObject 트리
- * @param targetId 업데이트할 객체의 ID
- * @param updater 업데이트 함수
- * @returns 업데이트된 BluePrintObject 트리의 복사본
- */
-export const updateBlueprintById = (
-  blueprint: BluePrintObject,
-  targetId: string,
-  updater: (obj: BluePrintObject) => BluePrintObject
-): BluePrintObject => {
-  // 현재 객체가 타겟인 경우 업데이트
-  if (blueprint.id === targetId) {
-    return updater(blueprint);
-  }
-
-  // 자식이 없는 경우 그대로 반환
-  if (!blueprint.child) {
-    return { ...blueprint };
-  }
-
-  // 자식이 배열인 경우
-  if (Array.isArray(blueprint.child)) {
-    return {
-      ...blueprint,
-      child: blueprint.child.map((child: BluePrintObject) =>
-        updateBlueprintById(child, targetId, updater)
-      ),
-    };
-  }
-
-  // 자식이 단일 객체인 경우
-  return {
-    ...blueprint,
-    child: updateBlueprintById(blueprint.child, targetId, updater),
-  };
 };
