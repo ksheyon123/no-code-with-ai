@@ -1,20 +1,13 @@
 import React, { CSSProperties, ReactNode } from "react";
+import { DOMBluePrint } from "@/types";
 
 interface IDOMRendererProps {
-  items: DOMItem | DOMItem[];
+  items: DOMBluePrint;
 }
-
-type DOMItem = {
-  id: string;
-  label?: string;
-  tag?: "div" | "ul" | "li";
-  style?: Record<string, string | number>;
-  child?: DOMItem | DOMItem[];
-};
 
 const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
   // 단일 아이템을 렌더링하는 함수
-  const renderItem = (item: DOMItem): ReactNode => {
+  const renderItem = (item: DOMBluePrint): ReactNode => {
     const { id, tag = "div", label = "", child: childItems } = item;
 
     // 동적으로 태그 생성

@@ -6,6 +6,7 @@ describe("DOMRenderer 컴포넌트", () => {
   it("단일 아이템을 올바르게 렌더링한다", () => {
     const singleItem = {
       id: "test-item",
+      type: "component",
       label: "테스트 아이템",
     };
 
@@ -21,16 +22,20 @@ describe("DOMRenderer 컴포넌트", () => {
 
   // 아이템 배열 렌더링 테스트
   it("아이템 배열을 올바르게 렌더링한다", () => {
-    const itemsArray = [
-      { id: "item-1", label: "아이템 1" },
-      { id: "item-2", label: "아이템 2" },
-      { id: "item-3", label: "아이템 3" },
-    ];
+    const itemsArray = {
+      id: "container",
+      type: "container",
+      child: [
+        { id: "item-1", type: "component", label: "아이템 1" },
+        { id: "item-2", type: "component", label: "아이템 2" },
+        { id: "item-3", type: "component", label: "아이템 3" },
+      ],
+    };
 
     render(<DOMRenderer items={itemsArray} />);
 
     // 모든 아이템이 렌더링되었는지 확인
-    itemsArray.forEach((item) => {
+    itemsArray.child.forEach((item) => {
       const renderedItem = document.getElementById(item.id);
       expect(renderedItem).toBeInTheDocument();
       expect(screen.getByText(item.label)).toBeInTheDocument();
@@ -41,11 +46,15 @@ describe("DOMRenderer 컴포넌트", () => {
   it("중첩된 아이템을 올바르게 렌더링한다", () => {
     const nestedItem = {
       id: "parent",
+      type: "container",
       label: "부모 요소",
-      child: {
-        id: "child",
-        label: "자식 요소",
-      },
+      child: [
+        {
+          id: "child",
+          type: "component",
+          label: "자식 요소",
+        },
+      ],
     };
 
     render(<DOMRenderer items={nestedItem} />);
@@ -68,10 +77,11 @@ describe("DOMRenderer 컴포넌트", () => {
   it("중첩된 아이템 배열을 올바르게 렌더링한다", () => {
     const nestedItemArray = {
       id: "parent",
+      type: "container",
       label: "부모 요소",
       child: [
-        { id: "child-1", label: "자식 요소 1" },
-        { id: "child-2", label: "자식 요소 2" },
+        { id: "child-1", type: "component", label: "자식 요소 1" },
+        { id: "child-2", type: "component", label: "자식 요소 2" },
       ],
     };
 
@@ -97,11 +107,25 @@ describe("DOMRenderer 컴포넌트", () => {
 
   // 다양한 태그 렌더링 테스트
   it("다양한 HTML 태그를 올바르게 렌더링한다", () => {
-    const itemsWithTags = [
-      { id: "div-item", tag: "div" as const, label: "DIV 요소" },
-      { id: "ul-item", tag: "ul" as const, label: "UL 요소" },
-      { id: "li-item", tag: "li" as const, label: "LI 요소" },
-    ];
+    const itemsWithTags = {
+      id: "tags-container",
+      type: "container",
+      child: [
+        {
+          id: "div-item",
+          type: "container",
+          tag: "div" as const,
+          label: "DIV 요소",
+        },
+        { id: "ul-item", type: "list", tag: "ul" as const, label: "UL 요소" },
+        {
+          id: "li-item",
+          type: "list-item",
+          tag: "li" as const,
+          label: "LI 요소",
+        },
+      ],
+    };
 
     render(<DOMRenderer items={itemsWithTags} />);
 
@@ -123,6 +147,7 @@ describe("DOMRenderer 컴포넌트", () => {
   it("태그가 지정되지 않으면 기본값으로 div를 사용한다", () => {
     const item = {
       id: "default-tag",
+      type: "component",
       label: "기본 태그 요소",
     };
 
@@ -136,6 +161,7 @@ describe("DOMRenderer 컴포넌트", () => {
   it("기본 스타일이 적용된다", () => {
     const item = {
       id: "styled-item",
+      type: "component",
       label: "스타일 요소",
     };
 
@@ -152,6 +178,7 @@ describe("DOMRenderer 컴포넌트", () => {
   it("라벨이 없는 경우 span 요소가 렌더링되지 않는다", () => {
     const item = {
       id: "no-label",
+      type: "component",
     };
 
     render(<DOMRenderer items={item} />);

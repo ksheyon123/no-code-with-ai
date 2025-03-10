@@ -1,6 +1,5 @@
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
-import { BluePrintObject } from "@/types";
 import { createRandomHash } from "@/utils/crypto";
 
 const UISelectModalFooter = () => {
@@ -25,7 +24,7 @@ const UISelectModalFooter = () => {
 
   return (
     <>
-      <div onClick={() => add()}>추가</div>
+      <div onClick={add}>추가</div>
       <div onClick={insert}>삽입</div>
     </>
   );

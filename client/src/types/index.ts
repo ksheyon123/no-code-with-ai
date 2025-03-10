@@ -1,12 +1,10 @@
-export type DOMBluePrint = {};
-
-export type BluePrintObject = {
+export type DOMBluePrint = {
   id: string;
   type: string;
-  description: string;
-  tag?: "div" | "ul" | "li";
+  description?: string;
   label?: string;
-  child?: BluePrintObject[];
+  tag?: "div" | "ul" | "li";
+  child?: DOMBluePrint[];
   attributes?: Record<string, string | number | boolean>;
   style?: Record<string, string | number>;
 };
