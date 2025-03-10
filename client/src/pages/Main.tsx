@@ -8,7 +8,7 @@ import { createRandomHash } from "@/utils/crypto";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 
 const Main: React.FC = () => {
-  const { blueprints } = useBlueprintContext();
+  const { blueprints, initBlueprint } = useBlueprintContext();
   const { openModal } = useModalContext();
   const mainRef = useRef<HTMLDivElement>(null);
   // 키 이벤트 핸들러
@@ -63,7 +63,13 @@ const Main: React.FC = () => {
       }
     };
   }, [mainRef]);
+
+  useEffect(() => {
+    initBlueprint();
+  }, []);
+
   console.log(blueprints);
+
   return (
     <div
       id="main_component"

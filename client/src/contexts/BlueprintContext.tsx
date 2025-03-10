@@ -4,6 +4,7 @@ import { createContext, ReactNode, useContext, useState } from "react";
 
 interface BlueprintContextType {
   blueprints: BluePrintObject | null;
+  initBlueprint: Function;
   addBlueprint: Function;
   updateBlueprint: Function;
   insertBlueprint: Function;
@@ -32,13 +33,36 @@ export const BlueprintContextProvider: React.FC<
 > = ({ children }) => {
   const [blueprints, setBlueprints] = useState<BluePrintObject | null>(null);
 
+  const initBlueprint = (config: Omit<BluePrintObject, "id">) => {
+    setBlueprints({
+      id: "root",
+      ...config,
+    });
+  };
+
   const addBlueprint = (
     targetId: string,
+    parentId: string,
     config: Omit<BluePrintObject, "id">
   ) => {
-    setBlueprints({
-      id: targetId,
-      ...config,
+    console.log(targetId, parentId);
+    setBlueprints((prev) => {
+      if (prev) {
+        const blueprint = findBlueprintById(prev, parentId);
+        if (blueprint) {
+          blueprint.child = [
+            {
+              id: targetId,
+              ...config,
+            },
+          ];
+        }
+        return {
+          ...prev,
+        };
+      }
+
+      return prev;
     });
   };
 
@@ -48,18 +72,19 @@ export const BlueprintContextProvider: React.FC<
     config: Omit<BluePrintObject, "id">
   ) => {
     if (!!blueprints) {
+      console.log(targetId);
       const blueprint = findBlueprintById(blueprints, parentId);
-
       if (blueprint) {
-        updateChildDirectly(blueprint, targetId, [
+        updateChildDirectly(blueprint, parentId, [
           {
             id: targetId,
             ...config,
           },
         ]);
+        console.log(blueprints);
       }
       if (blueprint?.child) {
-        updateChildDirectly(blueprint, targetId, [
+        updateChildDirectly(blueprint, parentId, [
           ...blueprint.child,
           {
             id: targetId,
@@ -75,13 +100,14 @@ export const BlueprintContextProvider: React.FC<
     config: Omit<BluePrintObject, "id">
   ) => {
     if (!blueprints || targetId) {
-      addBlueprint(targetId, config);
+      // addBlueprint(targetId, config);
     } else {
       const blueprint = findBlueprintById(blueprints, targetId);
     }
   };
 
   const value = {
+    initBlueprint,
     addBlueprint,
     updateBlueprint,
     insertBlueprint,

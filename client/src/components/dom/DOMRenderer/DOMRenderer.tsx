@@ -9,13 +9,14 @@ type DOMItem = {
   label?: string;
   tag?: "div" | "ul" | "li";
   style?: Record<string, string | number>;
-  items?: DOMItem | DOMItem[];
+  child?: DOMItem | DOMItem[];
 };
 
 const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
+  console.log("Render ", items);
   // 단일 아이템을 렌더링하는 함수
   const renderItem = (item: DOMItem): ReactNode => {
-    const { id, tag = "div", label = "", items: childItems } = item;
+    const { id, tag = "div", label = "", child: childItems } = item;
 
     // 동적으로 태그 생성
     const Tag = tag as keyof JSX.IntrinsicElements;

@@ -9,16 +9,16 @@ const UISelectModalFooter = () => {
 
   const add = () => {
     const d = modalState;
-    console.log(d);
     const tagId = createRandomHash();
-    addBlueprint(tagId, {
+    addBlueprint(tagId, d.targetId, {
       ...d,
     });
   };
 
   const insert = () => {
     const d = modalState;
-    insertBlueprint(d.id, {
+    const tagId = createRandomHash();
+    insertBlueprint(tagId, d.parentId, {
       ...d,
     });
   };
