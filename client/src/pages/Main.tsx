@@ -68,8 +68,6 @@ const Main: React.FC = () => {
     initBlueprint();
   }, []);
 
-  console.log(blueprints);
-
   return (
     <div
       id="main_component"

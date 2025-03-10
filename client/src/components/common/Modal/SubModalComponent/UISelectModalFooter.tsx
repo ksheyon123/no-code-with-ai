@@ -4,13 +4,13 @@ import { BluePrintObject } from "@/types";
 import { createRandomHash } from "@/utils/crypto";
 
 const UISelectModalFooter = () => {
-  const { addBlueprint, insertBlueprint } = useBlueprintContext();
+  const { updateBlueprint } = useBlueprintContext();
   const { modalState } = useModalContext();
 
   const add = () => {
     const d = modalState;
     const tagId = createRandomHash();
-    addBlueprint(tagId, d.targetId, {
+    updateBlueprint(tagId, d.targetId, {
       ...d,
     });
   };
@@ -18,7 +18,7 @@ const UISelectModalFooter = () => {
   const insert = () => {
     const d = modalState;
     const tagId = createRandomHash();
-    insertBlueprint(tagId, d.parentId, {
+    updateBlueprint(tagId, d.parentId, {
       ...d,
     });
   };

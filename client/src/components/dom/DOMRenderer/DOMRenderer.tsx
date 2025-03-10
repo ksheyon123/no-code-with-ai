@@ -13,7 +13,6 @@ type DOMItem = {
 };
 
 const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
-  console.log("Render ", items);
   // 단일 아이템을 렌더링하는 함수
   const renderItem = (item: DOMItem): ReactNode => {
     const { id, tag = "div", label = "", child: childItems } = item;

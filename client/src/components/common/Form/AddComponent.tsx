@@ -54,8 +54,8 @@ const AddComponent = ({ parentId, targetId }: any) => {
           }}
           name="요소"
           children={[
-            <Radio label="추가" name="추가" value="0" />,
-            <Radio label="삽입" name="삽입" value="1" />,
+            <Radio key="1" label="추가" name="추가" value="0" />,
+            <Radio key="2" label="삽입" name="삽입" value="1" />,
           ]}
         />
       </div>
