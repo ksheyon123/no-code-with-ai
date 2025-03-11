@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Root from "./pages/Root";
 import UI from "./pages/UI";
@@ -6,7 +6,12 @@ import Main from "./pages/Main";
 import { ModalContextProvider } from "@/contexts/ModalContext";
 import { BlueprintContextProvider } from "@/contexts/BlueprintContext";
 
+import { initWorker } from "./workers/architectureWorkerManager";
+
 const App: React.FC = () => {
+  useEffect(() => {
+    initWorker();
+  }, []);
   return (
     <BrowserRouter>
       <BlueprintContextProvider>

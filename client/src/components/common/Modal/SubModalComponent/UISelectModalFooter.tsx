@@ -1,6 +1,7 @@
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
 import { createRandomHash } from "@/utils/crypto";
+import { generateArchitectureCode } from "@/workers/architectureWorkerManager";
 
 const UISelectModalFooter = () => {
   const { updateBlueprint } = useBlueprintContext();
@@ -9,6 +10,11 @@ const UISelectModalFooter = () => {
   const add = () => {
     const d = modalState;
     const tagId = createRandomHash();
+    generateArchitectureCode({
+      id: tagId,
+      type: "input",
+      ...d,
+    });
     updateBlueprint(tagId, d.targetId, {
       ...d,
     });

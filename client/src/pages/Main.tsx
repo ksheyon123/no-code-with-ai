@@ -1,11 +1,9 @@
+import React, { RefObject, useEffect, useRef } from "react";
 import AddComponent from "@/components/common/Form/AddComponent";
-import List from "@/components/common/List/List";
 import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UISelectModalFooter";
 import DOMRenderer from "@/components/dom/DOMRenderer/DOMRenderer";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
-import { createRandomHash } from "@/utils/crypto";
-import React, { RefObject, useEffect, useRef, useState } from "react";
 
 const Main: React.FC = () => {
   const { blueprints, initBlueprint } = useBlueprintContext();
