@@ -5,6 +5,7 @@ import DOMRenderer from "@/components/dom/DOMRenderer/DOMRenderer";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
 import { worker } from "@/workers/architectureWorkerManager";
+import { createRandomHash } from "@/utils/crypto";
 
 const Main: React.FC = () => {
   const { blueprints, initBlueprint } = useBlueprintContext();
@@ -64,14 +65,19 @@ const Main: React.FC = () => {
   }, [mainRef]);
 
   useEffect(() => {
-    initBlueprint();
+    const tagId = createRandomHash();
+    initBlueprint(tagId, {
+      style: {
+        width: "100%",
+        height: "100%",
+      },
+    });
   }, []);
 
-  console.log(blueprints);
   return (
     <div
       id="main_component"
-      className="main"
+      className="css_wrapper"
       ref={mainRef as RefObject<HTMLDivElement>}
     >
       {blueprints && <DOMRenderer items={blueprints} />}

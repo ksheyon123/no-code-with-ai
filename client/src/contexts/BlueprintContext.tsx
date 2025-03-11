@@ -31,9 +31,9 @@ export const BlueprintContextProvider: React.FC<
 > = ({ children }) => {
   const [blueprints, setBlueprints] = useState<DOMBluePrint | null>(null);
 
-  const initBlueprint = (config: Omit<DOMBluePrint, "id">) => {
+  const initBlueprint = (newId: string, config: Omit<DOMBluePrint, "id">) => {
     setBlueprints({
-      id: "root",
+      id: newId,
       ...config,
     });
   };

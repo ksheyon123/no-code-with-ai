@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- 배경 (투명) -->
+  <rect width="300" height="300" fill="transparent"/>
+  
+  <!-- 코드 블럭 기호 <> -->
+  <g fill="#3E64FF" stroke="#3E64FF" stroke-width="2">
+    <!-- < 기호 -->
+    <path d="M90 140 L50 170 L90 200" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- > 기호 -->
+    <path d="M210 140 L250 170 L210 200" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- 앰퍼샌드 & -->
+  <path d="M160 115 C140 100, 120 100, 110 115 C100 130, 110 150, 130 165 C100 200, 120 230, 140 240 C160 250, 180 235, 180 215 C180 195, 160 185, 140 200 C150 170, 180 150, 190 130" 
+        fill="none" stroke="#FF6B6B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

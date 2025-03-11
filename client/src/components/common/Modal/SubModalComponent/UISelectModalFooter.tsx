@@ -9,12 +9,13 @@ const UISelectModalFooter = () => {
 
   const add = () => {
     const d = modalState;
+    console.log("Modal Data : ", d);
     const tagId = createRandomHash();
     generateArchitectureCode(
       {
-        id: tagId,
-        type: "input",
         ...d,
+        id: tagId,
+        type: d.type,
       },
       {
         onSuccess: ({ message }: any) => {

@@ -6,6 +6,10 @@ import Radio, { RadioGroup } from "../Radio";
 
 const items: DropdownItem[] = [
   {
+    id: "defaultwrapper",
+    label: "Wrapper",
+  },
+  {
     id: "horizontal",
     label: "Horizontal",
   },

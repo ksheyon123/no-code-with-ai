@@ -7,6 +7,7 @@ interface IDOMRendererProps {
 }
 
 const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
+  console.log(items);
   // 단일 아이템을 렌더링하는 함수
   const renderItem = (item: DOMBluePrint): ReactNode => {
     const {
@@ -17,8 +18,8 @@ const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
       jsx,
       componentName,
       imports,
+      style,
     } = item;
-
     // 동적으로 태그 생성
     const Tag = tag as keyof JSX.IntrinsicElements;
 
@@ -35,13 +36,16 @@ const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
         componentName,
         imports,
       });
-      console.log(Componet);
       return <>{!!Componet ? <Componet /> : <></>}</>;
     }
 
     // 태그와 속성, 자식 요소를 포함한 JSX 반환
     return (
-      <Tag key={id} id={id} style={{ width: 200, height: 200 }}>
+      <Tag
+        key={id}
+        id={id}
+        style={{ width: style?.width || 200, height: style?.height || 200 }}
+      >
         {label && <span>{label}</span>}
         {children}
       </Tag>
