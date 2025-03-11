@@ -53,3 +53,9 @@ export interface RequestConfig {
 export interface ApiResponse<T = any> {
   data: T;
 }
+
+export interface ResponseJSX {
+  jsx_code: string;
+  component_name: string;
+  imports: string[];
+}

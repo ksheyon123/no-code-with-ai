@@ -1,4 +1,5 @@
 import React, { CSSProperties, ReactNode } from "react";
+import { transpileJSX } from "@/utils/ui";
 import { DOMBluePrint } from "@/types";
 
 interface IDOMRendererProps {
@@ -8,7 +9,15 @@ interface IDOMRendererProps {
 const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
   // 단일 아이템을 렌더링하는 함수
   const renderItem = (item: DOMBluePrint): ReactNode => {
-    const { id, tag = "div", label = "", child: childItems } = item;
+    const {
+      id,
+      tag = "div",
+      label = "",
+      child: childItems,
+      jsx,
+      componentName,
+      imports,
+    } = item;
 
     // 동적으로 태그 생성
     const Tag = tag as keyof JSX.IntrinsicElements;
@@ -19,6 +28,15 @@ const DOMRenderer: React.FC<IDOMRendererProps> = ({ items }) => {
       children = Array.isArray(childItems)
         ? childItems.map((child) => renderItem(child))
         : renderItem(childItems);
+    }
+    if (jsx && componentName && imports) {
+      const Componet = transpileJSX({
+        jsx,
+        componentName,
+        imports,
+      });
+      console.log(Componet);
+      return <>{!!Componet ? <Componet /> : <></>}</>;
     }
 
     // 태그와 속성, 자식 요소를 포함한 JSX 반환

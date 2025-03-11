@@ -15,6 +15,9 @@
 export type DOMBluePrint = {
   id: string;
   type: string;
+  jsx?: string;
+  componentName?: string;
+  imports?: string[];
   description?: string;
   label?: string;
   tag?: "div" | "ul" | "li";
@@ -22,3 +25,5 @@ export type DOMBluePrint = {
   attributes?: Record<string, string | number | boolean>;
   style?: Record<string, string | number>;
 };
+
+export type DOMComponentFormat = {};

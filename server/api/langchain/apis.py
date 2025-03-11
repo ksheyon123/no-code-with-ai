@@ -122,7 +122,6 @@ def req_ui_component(request, format=None):
         # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
         import json
         architecture = json.loads(request.body.decode('utf-8'))
-        print(architecture)
     except Exception as e:
         print(f"JSON 파싱 오류: {e}")
         # 오류 발생 시 원본 바이트 문자열 사용
@@ -136,10 +135,18 @@ def req_ui_component(request, format=None):
     print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
     parser = JsonOutputParser()
     # JSON 스키마 형식 정의
-    format_instructions = '{{"target_id": "architecture의 id를 사용합니다.", "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
+    format_instructions = '{{ "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요.", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
+    example = """
+      jsx_code: "const ComponentName = () => {\n const [inputValue, setInputValue] = useState('');\n\n  const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };\n\n  return (\n    <div id={target_id} style={{display: 'flex'}}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} />\n      </div>\n      <button disabled={!inputValue}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>\n  );\n};",
+      component_name: "ComponentName",
+      imports: ["import React, { useState } from 'react';"],
+    """
     prompt_template = """
     You are an expert web developer. Create JSX code based on the given architecture.
+
+    Example : {example}
     
+
     Architecture: {architecture}
     
     1. Return Only JSON 
@@ -151,10 +158,20 @@ def req_ui_component(request, format=None):
     print(prompt)
     # 체인 구성
     chain = prompt.pipe(model).pipe(parser)
+    # architecture 구조 확인을 위한 디버깅 출력
+    print(f"Architecture 구조: {architecture}")
+    
+    # 딕셔너리에서 id 값 안전하게 추출
+    target_id = architecture.get('id', 'default_id')
+    print(f"Target ID: {target_id}")
+    
     response = chain.invoke({
         "architecture": architecture,
+        "example" : example,
+        "target_id" : target_id,
         "format_instructions": format_instructions
     })
+    print(response)
     
     return Response({
         'status': 'Success',

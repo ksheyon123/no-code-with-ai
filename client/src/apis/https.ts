@@ -11,7 +11,7 @@ import {
   RequestConfig,
 } from "@/types/https";
 
-const DEFAULT_TIMEOUT = 5000; // 5초 타임아웃 (기본값)
+const DEFAULT_TIMEOUT = 30000; // 30초 타임아웃 (LangChain 모델 처리를 위해 증가)
 /**
  * 모든 요청에 적용되는 기본 헤더
  */

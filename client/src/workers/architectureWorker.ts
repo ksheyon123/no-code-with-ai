@@ -56,13 +56,12 @@ async function processNextRequest() {
     } as WorkerResponse);
 
     // 서버에 요청 전송
-    const response = await sendArchitecture(request.blueprint);
-    console.log(response);
+    const { data } = await sendArchitecture(request.blueprint);
     // 결과 전송
     self.postMessage({
       type: "RESULT",
       requestId: request.id,
-      payload: response.data,
+      payload: data,
     } as WorkerResponse);
   } catch (error) {
     // 에러 전송

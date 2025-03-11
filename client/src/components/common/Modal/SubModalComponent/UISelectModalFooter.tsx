@@ -17,9 +17,13 @@ const UISelectModalFooter = () => {
         ...d,
       },
       {
-        onSuccess: (payload) => {
+        onSuccess: ({ message }: any) => {
+          const { component_name, imports, jsx_code } = message;
           updateBlueprint(tagId, d.targetId, {
-            ...payload,
+            ...d,
+            jsx: jsx_code,
+            componentName: component_name,
+            imports,
           });
         },
       }
