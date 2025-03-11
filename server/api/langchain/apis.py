@@ -145,7 +145,6 @@ def req_ui_component(request, format=None):
     You are an expert web developer. Create JSX code based on the given architecture.
 
     Example : {example}
-    
 
     Architecture: {architecture}
     
