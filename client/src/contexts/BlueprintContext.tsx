@@ -1,9 +1,9 @@
-import { BluePrintObject } from "@/types";
-import { findBlueprintById, updateChildDirectly } from "@/utils/blueprint";
+import { DOMBluePrint } from "@/types";
+import { findBlueprintById } from "@/utils/blueprint";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface BlueprintContextType {
-  blueprints: BluePrintObject | null;
+  blueprints: DOMBluePrint | null;
   initBlueprint: Function;
   updateBlueprint: Function;
 }
@@ -29,9 +29,9 @@ interface BlueprintContextProviderProps {
 export const BlueprintContextProvider: React.FC<
   BlueprintContextProviderProps
 > = ({ children }) => {
-  const [blueprints, setBlueprints] = useState<BluePrintObject | null>(null);
+  const [blueprints, setBlueprints] = useState<DOMBluePrint | null>(null);
 
-  const initBlueprint = (config: Omit<BluePrintObject, "id">) => {
+  const initBlueprint = (config: Omit<DOMBluePrint, "id">) => {
     setBlueprints({
       id: "root",
       ...config,
@@ -41,7 +41,7 @@ export const BlueprintContextProvider: React.FC<
   const updateBlueprint = (
     newId: string,
     targetId: string,
-    config: Omit<BluePrintObject, "id">
+    config: Omit<DOMBluePrint, "id">
   ) => {
     setBlueprints((prev) => {
       if (prev) {
