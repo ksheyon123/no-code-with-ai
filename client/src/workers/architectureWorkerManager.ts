@@ -88,6 +88,7 @@ function handleWorkerMessage(event: MessageEvent) {
   switch (type) {
     case "RESULT":
       if (request.onSuccess) {
+        console.log(payload);
         request.onSuccess(payload as ArchitectureResponse);
       }
       pendingRequests.delete(requestId);

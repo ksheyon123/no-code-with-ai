@@ -4,6 +4,7 @@ import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UIS
 import DOMRenderer from "@/components/dom/DOMRenderer/DOMRenderer";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
+import { worker } from "@/workers/architectureWorkerManager";
 
 const Main: React.FC = () => {
   const { blueprints, initBlueprint } = useBlueprintContext();
@@ -66,6 +67,7 @@ const Main: React.FC = () => {
     initBlueprint();
   }, []);
 
+  console.log(blueprints);
   return (
     <div
       id="main_component"

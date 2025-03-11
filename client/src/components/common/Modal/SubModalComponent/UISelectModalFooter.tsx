@@ -10,14 +10,20 @@ const UISelectModalFooter = () => {
   const add = () => {
     const d = modalState;
     const tagId = createRandomHash();
-    generateArchitectureCode({
-      id: tagId,
-      type: "input",
-      ...d,
-    });
-    updateBlueprint(tagId, d.targetId, {
-      ...d,
-    });
+    generateArchitectureCode(
+      {
+        id: tagId,
+        type: "input",
+        ...d,
+      },
+      {
+        onSuccess: (payload) => {
+          updateBlueprint(tagId, d.targetId, {
+            ...payload,
+          });
+        },
+      }
+    );
   };
 
   const insert = () => {

@@ -53,9 +53,6 @@ def req_simple_architecture(request, format=None):
             "id": 1,
             "type": "HorizontalWrapper",
             "description": "이 컴포넌트는 DOM 객체를 수평으로 배열 합니다.",
-            "style"  : {
-                "display" : "flex"
-            },
             "child":[
                 {
                    "id": 2,
@@ -90,6 +87,56 @@ def req_simple_architecture(request, format=None):
     parser = JsonOutputParser()
     # JSON 스키마 형식 정의
     format_instructions = '{{"jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
+    prompt_template = """
+    You are an expert web developer. Create JSX code based on the given architecture.
+    
+    Architecture: {architecture}
+    
+    1. Return Only JSON 
+    2. Return a JSON response with the following structure:
+    {format_instructions}
+    """
+    
+    prompt = set_prompt(prompt_template, ["architecture"], {"format_instructions": format_instructions})
+    print(prompt)
+    # 체인 구성
+    chain = prompt.pipe(model).pipe(parser)
+    response = chain.invoke({
+        "architecture": architecture,
+        "format_instructions": format_instructions
+    })
+    
+    return Response({
+        'status': 'Success',
+        'message': response
+    })
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_ui_component(request, format=None):
+    """
+    LangChain을 통해 architecture를 받아 JSX 코드를 JSON 형식으로 반환
+    """
+    try:
+        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
+        import json
+        architecture = json.loads(request.body.decode('utf-8'))
+        print(architecture)
+    except Exception as e:
+        print(f"JSON 파싱 오류: {e}")
+        # 오류 발생 시 원본 바이트 문자열 사용
+        architecture = request.body.decode('utf-8')
+        print(f"원본 문자열 사용: {architecture}")
+
+    print("LangChain Model을 가져옵니다...")
+    model = get_langchain_model()
+    # 실제 LangChain 초기화 로직 호출
+
+    print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
+    parser = JsonOutputParser()
+    # JSON 스키마 형식 정의
+    format_instructions = '{{"target_id": "architecture의 id를 사용합니다.", "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
     prompt_template = """
     You are an expert web developer. Create JSX code based on the given architecture.
     

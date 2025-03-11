@@ -5,6 +5,7 @@
  * 메인 스레드가 차단되지 않도록 별도의 스레드에서 작업을 수행합니다.
  */
 
+import { sendArchitecture } from "@/apis/api";
 import { post } from "../apis/https";
 
 // 타입 정의
@@ -42,7 +43,6 @@ async function processNextRequest() {
 
   isProcessing = true;
   const request = requestQueue[0];
-
   try {
     // 진행 상태 알림
     self.postMessage({
@@ -56,10 +56,8 @@ async function processNextRequest() {
     } as WorkerResponse);
 
     // 서버에 요청 전송
-    const response = await post(API_ENDPOINT, {
-      blueprint: request.blueprint,
-    });
-
+    const response = await sendArchitecture(request.blueprint);
+    console.log(response);
     // 결과 전송
     self.postMessage({
       type: "RESULT",
