@@ -5,7 +5,7 @@
  * UI 아키텍처 생성 요청을 워커에 전달하고 결과를 받아 처리합니다.
  */
 
-import { DOMBluePrint } from "@/types";
+import { DOMBluePrint, ElementGenerationParams } from "@/types";
 
 // 타입 정의
 export interface ArchitectureRequest {
@@ -38,7 +38,7 @@ interface RequestCallbacks {
 
 interface PendingRequest extends RequestCallbacks {
   id: string;
-  blueprint: DOMBluePrint;
+  params: ElementGenerationParams;
 }
 
 // 워커 관리
@@ -114,12 +114,12 @@ function handleWorkerMessage(event: MessageEvent) {
 /**
  * 아키텍처 코드 생성 요청
  *
- * @param blueprint - 아키텍처 청사진 데이터
+ * @param params - 아키텍처 청사진 데이터
  * @param callbacks - 콜백 함수 객체 (성공, 에러, 진행 상태)
  * @returns 요청 ID (취소에 사용 가능)
  */
 export function generateArchitectureCode(
-  blueprint: DOMBluePrint,
+  params: ElementGenerationParams,
   callbacks: RequestCallbacks = {}
 ): string {
   // 워커 초기화
@@ -132,12 +132,19 @@ export function generateArchitectureCode(
     return "";
   }
 
+  const id = params.targetId;
+  if (!id) {
+    if (callbacks.onError) {
+      callbacks.onError(new Error("target ID가 없습니다."));
+    }
+    return "";
+  }
+
   // 요청 ID 생성
-  const requestId = blueprint.id;
   // 요청 정보 저장
-  pendingRequests.set(requestId, {
-    id: requestId,
-    blueprint,
+  pendingRequests.set(id, {
+    id,
+    params,
     ...callbacks,
   });
 
@@ -145,13 +152,13 @@ export function generateArchitectureCode(
   worker.postMessage({
     type: "ADD_REQUEST",
     payload: {
-      id: requestId,
-      blueprint,
+      id,
+      params,
       timestamp: Date.now(),
     },
   });
 
-  return requestId;
+  return id;
 }
 
 /**

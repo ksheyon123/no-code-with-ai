@@ -7,11 +7,12 @@
 
 import { sendArchitecture } from "@/apis/api";
 import { post } from "../apis/https";
+import { ElementGenerationParams } from "@/types";
 
 // 타입 정의
 interface ArchitectureRequest {
   id: string;
-  blueprint: any; // 아키텍처 청사진 데이터
+  params: ElementGenerationParams; // 아키텍처 청사진 데이터
   timestamp: number;
 }
 
@@ -25,9 +26,6 @@ interface WorkerResponse {
   requestId: string;
   payload: any;
 }
-
-// 서버 엔드포인트 (실제 엔드포인트로 변경 필요)
-const API_ENDPOINT = "/api/generate-code";
 
 // 요청 큐
 let requestQueue: ArchitectureRequest[] = [];
@@ -56,7 +54,7 @@ async function processNextRequest() {
     } as WorkerResponse);
 
     // 서버에 요청 전송
-    const { data } = await sendArchitecture(request.blueprint);
+    const { data } = await sendArchitecture(request.params);
     // 결과 전송
     self.postMessage({
       type: "RESULT",
@@ -120,6 +118,7 @@ function cancelRequest(requestId: string) {
  */
 self.addEventListener("message", (event: MessageEvent<WorkerMessage>) => {
   const { type, payload } = event.data;
+  console.log(type, payload);
   switch (type) {
     case "ADD_REQUEST":
       addRequest(payload as ArchitectureRequest);

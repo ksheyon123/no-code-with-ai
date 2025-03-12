@@ -1,9 +1,8 @@
 import { DOMBluePrint } from "@/types";
-import { findBlueprintById } from "@/utils/blueprint";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface BlueprintContextType {
-  blueprints: DOMBluePrint | null;
+  blueprints: Map<string, DOMBluePrint>;
   initBlueprint: Function;
   updateBlueprint: Function;
 }
@@ -29,46 +28,29 @@ interface BlueprintContextProviderProps {
 export const BlueprintContextProvider: React.FC<
   BlueprintContextProviderProps
 > = ({ children }) => {
-  const [blueprints, setBlueprints] = useState<DOMBluePrint | null>(null);
+  const [blueprints, setBlueprints] = useState<Map<string, DOMBluePrint>>(
+    new Map()
+  );
 
-  const initBlueprint = (newId: string, config: Omit<DOMBluePrint, "id">) => {
-    setBlueprints({
-      id: newId,
-      ...config,
-    });
+  const initBlueprint = (newId: string, config: DOMBluePrint) => {
+    const newBlueprints = new Map(blueprints);
+    newBlueprints.set(newId, config);
+    setBlueprints(newBlueprints);
   };
 
   const updateBlueprint = (
     newId: string,
-    targetId: string,
-    config: Omit<DOMBluePrint, "id">
+    curElId: string,
+    config: DOMBluePrint
   ) => {
-    setBlueprints((prev) => {
-      if (prev) {
-        const blueprint = findBlueprintById(prev, targetId);
-        if (blueprint) {
-          blueprint.child = blueprint.child
-            ? [
-                ...blueprint.child,
-                {
-                  id: newId,
-                  ...config,
-                },
-              ]
-            : [
-                {
-                  id: newId,
-                  ...config,
-                },
-              ];
-        }
-        return {
-          ...prev,
-        };
-      }
-
-      return prev;
-    });
+    const prevBlueprint = new Map(blueprints);
+    const targetBlueprint = prevBlueprint.get(curElId);
+    // 객체의 children에 추가
+    if (targetBlueprint && targetBlueprint.children) {
+      targetBlueprint.children.push(newId);
+    }
+    // Blueprint 추가
+    initBlueprint(newId, config);
   };
 
   const value = {

@@ -12,18 +12,37 @@
  * @property {Record<string, string | number>} [style] - DOM 객체의 스타일
  */
 
-export type DOMBluePrint = {
-  id: string;
+// 사용자 입력 관련 속성
+export type ElementGenerationParams = {
   type: string;
+  description?: string;
+  label?: string;
+  radioType?: string;
+  parentElId?: string;
+  curElId?: string;
+  targetId?: string;
+};
+
+// 서버에서 제공하는 속성
+export type ServerProvidedProps = {
   jsx?: string;
   componentName?: string;
   imports?: string[];
-  description?: string;
-  label?: string;
-  tag?: "div" | "ul" | "li";
-  child?: DOMBluePrint[];
   attributes?: Record<string, string | number | boolean>;
   style?: Record<string, string | number>;
 };
+
+// DOM 구조 관련 속성
+export type DOMStructureProps = {
+  children?: string[];
+  siblings?: string[];
+};
+
+// 최종 DOMBluePrint 타입
+export type DOMBluePrint = {
+  id: string;
+} & ElementGenerationParams &
+  ServerProvidedProps &
+  DOMStructureProps;
 
 export type DOMComponentFormat = {};

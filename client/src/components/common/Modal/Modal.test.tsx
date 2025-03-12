@@ -127,18 +127,7 @@ describe("Modal Component", () => {
       <TestWrapper>
         <Modal isOpen={true} onClose={handleClose}>
           <Modal.Content>
-            {(state, setState) => {
-              return (
-                <div>
-                  <button
-                    onClick={() => setState({ count: (state.count || 0) + 1 })}
-                  >
-                    증가
-                  </button>
-                  <span>카운트: {state.count || 0}</span>
-                </div>
-              );
-            }}
+            <></>
           </Modal.Content>
         </Modal>
       </TestWrapper>
@@ -158,11 +147,7 @@ describe("Modal Component", () => {
       <TestWrapper>
         <Modal isOpen={true} onClose={handleClose}>
           <Modal.Content>
-            {(state, setState) => (
-              <button onClick={() => setState({ confirmed: true })}>
-                확인하기
-              </button>
-            )}
+            <></>
           </Modal.Content>
           <Modal.Footer>
             {(state) => <button disabled={!state.confirmed}>제출</button>}

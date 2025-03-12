@@ -6,6 +6,7 @@ import { dropdownItems } from "@/constants";
 import InputWrapper from "@/components/common/Input/InputWrapper";
 import Input from "@/components/common/Input/Input";
 import TextArea from "@/components/common/TextArea/Textarea";
+import { ElementGenerationParams } from "@/types";
 
 interface WrapperProps {
   children: ReactNode;
@@ -23,17 +24,17 @@ const Wrapper: React.FC<WrapperProps> = ({ label, children }) => {
   );
 };
 
-const AddComponent = ({ parentId, targetId }: any) => {
-  const { modalState, setModalState } = useModalContext();
+const AddComponent = ({ parentElId, curElId }: any) => {
+  const { modalState, setModalState } =
+    useModalContext<ElementGenerationParams>();
   useEffect(() => {
-    setModalState((prev) => {
-      return {
-        ...prev,
-        parentId,
-        targetId,
-        type: dropdownItems[0].id,
-      };
-    });
+    // initialize
+    setModalState((prev: ElementGenerationParams) => ({
+      ...prev,
+      parentElId,
+      curElId,
+      type: dropdownItems[0].id,
+    }));
   }, []);
   return (
     <div style={{ minHeight: 400 }}>

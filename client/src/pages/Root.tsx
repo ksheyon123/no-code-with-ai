@@ -7,7 +7,7 @@ const Root: React.FC = () => {
     <>
       <Header />
       <main className="main">
-        <Outlet />;
+        <Outlet />
       </main>
     </>
   );

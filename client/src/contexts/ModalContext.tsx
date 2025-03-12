@@ -16,14 +16,14 @@ interface ModalOptions {
   onNext?: () => void;
 }
 
-interface ModalContextType {
+interface ModalContextType<T> {
   isOpen: boolean;
   modalContent: ReactNode | ReactNode[] | null;
   modalHeader: ReactNode | null;
   modalFooter: ReactNode | null;
   modalOptions: ModalOptions;
-  modalState: Record<string, any>;
-  setModalState: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  modalState: T;
+  setModalState: React.Dispatch<React.SetStateAction<T>>;
   openModal: (
     content: ReactNode | ReactNode[],
     header?: ReactNode,
@@ -33,9 +33,11 @@ interface ModalContextType {
   closeModal: () => void;
 }
 
-const ModalContext = createContext<ModalContextType | undefined>(undefined);
+const ModalContext = createContext<ModalContextType<any> | undefined>(
+  undefined
+);
 
-export const useModalContext = () => {
+export const useModalContext = <T,>(): ModalContextType<T> => {
   const context = useContext(ModalContext);
   if (context === undefined) {
     throw new Error(

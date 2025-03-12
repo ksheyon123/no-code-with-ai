@@ -1,15 +1,15 @@
 import React, { RefObject, useEffect, useRef } from "react";
 import AddComponent from "@/components/common/Form/AddComponent";
 import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UISelectModalFooter";
-import DOMRenderer from "@/components/dom/DOMRenderer/DOMRenderer";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
 import { worker } from "@/workers/architectureWorkerManager";
 import { createRandomHash } from "@/utils/crypto";
+import { ElementGenerationParams } from "@/types";
 
 const Main: React.FC = () => {
   const { blueprints, initBlueprint } = useBlueprintContext();
-  const { openModal } = useModalContext();
+  const { openModal } = useModalContext<ElementGenerationParams>();
   const mainRef = useRef<HTMLDivElement>(null);
   // 키 이벤트 핸들러
   useEffect(() => {
@@ -33,7 +33,7 @@ const Main: React.FC = () => {
         const ptagId = p[1].id;
 
         openModal(
-          <AddComponent parentId={ptagId} targetId={tagId} />,
+          <AddComponent parentElId={ptagId} curElId={tagId} />,
           <></>,
           <UISelectModalFooter />,
           {
@@ -80,7 +80,7 @@ const Main: React.FC = () => {
       className="css_wrapper"
       ref={mainRef as RefObject<HTMLDivElement>}
     >
-      {blueprints && <DOMRenderer items={blueprints} />}
+      {/* {blueprints && <DOMRenderer items={blueprints} />} */}
     </div>
   );
 };

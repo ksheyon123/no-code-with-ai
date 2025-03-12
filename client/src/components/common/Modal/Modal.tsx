@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import { useModalContext } from "@/contexts/ModalContext";
 import "./Modal.css";
+import { ElementGenerationParams } from "@/types";
 
 // 모달 컴포넌트 Props
 interface ModalProps {
@@ -88,12 +89,7 @@ const ModalHeader: React.FC<HeaderProps> = ({
 
 // Content 컴포넌트
 interface ContentProps {
-  children:
-    | ReactNode
-    | ((
-        state: Record<string, any>,
-        setState: React.Dispatch<React.SetStateAction<Record<string, any>>>
-      ) => ReactNode);
+  children: ReactNode;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -103,7 +99,8 @@ const ModalContent: React.FC<ContentProps> = ({
   className = "",
   style,
 }) => {
-  const { modalState, setModalState } = useModalContext();
+  const { modalState, setModalState } =
+    useModalContext<ElementGenerationParams>();
 
   return (
     <div
@@ -111,9 +108,7 @@ const ModalContent: React.FC<ContentProps> = ({
       data-testid="modal-content"
       style={style}
     >
-      {typeof children === "function"
-        ? children(modalState, setModalState)
-        : children}
+      {children}
     </div>
   );
 };
@@ -130,7 +125,7 @@ const ModalFooter: React.FC<FooterProps> = ({
   className = "",
   style,
 }) => {
-  const { modalState } = useModalContext();
+  const { modalState } = useModalContext<ElementGenerationParams>();
 
   return (
     <div
