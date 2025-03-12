@@ -140,7 +140,7 @@ def req_ui_component(request, format=None):
     example = """
       "new_id" : ajksndalkwajdoansd,
       "target_id" : lkasjjasldiwnmxals,
-      "jsx_code": "const ComponentName = () => {\n const [inputValue, setInputValue] = useState('');\n\n  const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };\n\n  return (\n    <div style={{display: 'flex'}}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} />\n      </div>\n      <button disabled={!inputValue}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>\n  );\n};",
+      "jsx_code": "const ComponentName = () => {\n const [inputValue, setInputValue] = useState('');\n\n  const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };\n\n  return (\n    <div id="ajksndalkwajdoansd" style={{display: 'flex'}}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} />\n      </div>\n      <button disabled={!inputValue}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>\n  );\n};",
       "component_name": "ComponentName",
       "imports": ["import React, { useState } from 'react';"],
       "styles"?: {"width" : "100%", "height" : "100%"},
