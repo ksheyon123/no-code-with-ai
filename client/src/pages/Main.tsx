@@ -72,7 +72,8 @@ const Main: React.FC = () => {
     });
   }, []);
 
-  console.log(blueprints);
+  // console.log("domStructure : ", domStructure);
+  console.log("blueprints : ", blueprints);
 
   return (
     <div

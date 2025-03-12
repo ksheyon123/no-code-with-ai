@@ -30,7 +30,6 @@ const DOMRenderer: React.FC = () => {
   ): React.ReactNode => {
     // domStructure에서 해당 ID의 요소 정보를 가져옵니다.
     const domElement = domStructureMap.get(id);
-
     // 요소가 없으면 null을 반환합니다.
     if (!domElement) {
       return null;
@@ -60,8 +59,6 @@ const DOMRenderer: React.FC = () => {
           // }
           const Component = transpileJSX(blueprint);
 
-          // 실제 프로덕션에서는 이 부분을 동적으로 JSX를 렌더링하는 방식으로 구현해야 합니다.
-          // 여기서는 간단히 div로 감싸서 표현합니다.
           return <Component key={blueprint.new_id}>{children}</Component>;
         }
       } catch (error) {
