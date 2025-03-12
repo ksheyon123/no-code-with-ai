@@ -15,17 +15,17 @@ interface IListProps {
 
 const List: React.FC<IListProps> = ({ items = [], itemRenderer }) => {
   return (
-    <ul>
+    <div>
       {items.map((item, idx) => {
         const { id, label } = item;
         return (
-          <li key={id + idx}>
+          <div key={id + idx}>
             {!itemRenderer && <span>{label}</span>}
             {!!itemRenderer && itemRenderer(item)}
-          </li>
+          </div>
         );
       })}
-    </ul>
+    </div>
   );
 };
 

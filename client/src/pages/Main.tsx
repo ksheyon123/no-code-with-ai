@@ -7,6 +7,7 @@ import { useModalContext } from "@/contexts/ModalContext";
 import { worker } from "@/workers/architectureWorkerManager";
 import { createRandomHash } from "@/utils/crypto";
 import { ElementGenerationParams } from "@/types";
+import DOMLayoutViewer from "@/components/common/DOMLayoutViewer/DOMLayoutViewer";
 
 const Main: React.FC = () => {
   const { domStructure, blueprints, initDomStructure } = useBlueprintContext();
@@ -76,13 +77,16 @@ const Main: React.FC = () => {
   console.log("blueprints : ", blueprints);
 
   return (
-    <div
-      id="main_component"
-      className="css_wrapper"
-      ref={mainRef as RefObject<HTMLDivElement>}
-    >
-      <DOMRenderer />
-    </div>
+    <>
+      <div
+        id="main_component"
+        className="css_wrapper"
+        ref={mainRef as RefObject<HTMLDivElement>}
+      >
+        <DOMRenderer />
+      </div>
+      <DOMLayoutViewer />
+    </>
   );
 };
 
