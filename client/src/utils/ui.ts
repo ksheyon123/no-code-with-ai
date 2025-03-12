@@ -2,20 +2,19 @@ import React from "react";
 import * as Babel from "@babel/standalone";
 import { Blueprint } from "@/types";
 
-const transpileJSX = ({ jsx_code, componentName, imports }: Blueprint) => {
+const transpileJSX = ({ jsx_code, component_name, imports }: Blueprint) => {
   try {
     // 컴포넌트 코드만 사용 (import 문은 제외)
     const fullCode = `
         ${jsx_code}
     `;
-
     console.log("Full code:", fullCode);
 
     // JSX를 JavaScript로 변환
     const transformedCode = Babel.transform(fullCode, {
       presets: ["react"],
     });
-    console.log("Transformed code:", transformedCode);
+    console.log("Transformed code:", transformedCode.code);
 
     // 변환된 코드가 없으면 오류 처리
     if (!transformedCode.code) {
@@ -26,7 +25,7 @@ const transpileJSX = ({ jsx_code, componentName, imports }: Blueprint) => {
     const dynamicComponent = new Function(
       "React",
       "useState",
-      `${transformedCode.code}; return ${componentName};`
+      `${transformedCode.code}; return ${component_name};`
     )(React, React.useState);
     console.log("Created component:", dynamicComponent);
 
@@ -43,4 +42,15 @@ const transpileJSX = ({ jsx_code, componentName, imports }: Blueprint) => {
   return null; // 오류 발생 시 명시적으로 null 반환
 };
 
-export { transpileJSX };
+const transpileReactComponent = (props: Blueprint) => {
+  const { attributes, styles } = props;
+
+  const reactEl = React.createElement("div", {
+    ...(attributes && { property: attributes }),
+    ...(styles && { style: styles }),
+  });
+  console.log(reactEl);
+  return reactEl;
+};
+
+export { transpileJSX, transpileReactComponent };

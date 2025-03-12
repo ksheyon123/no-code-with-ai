@@ -26,7 +26,7 @@ export type ElementGenerationParams = {
 export type Blueprint = {
   new_id: string;
   jsx_code: string;
-  componentName: string;
+  component_name: string;
   imports: string[];
   attributes?: Record<string, string | number | boolean>;
   styles?: Record<string, string | number>;

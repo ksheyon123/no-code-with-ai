@@ -1,7 +1,7 @@
 import React from "react";
 import { DOMStructureProps, Blueprint } from "@/types";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
-import { transpileJSX } from "@/utils/ui";
+import { transpileJSX, transpileReactComponent } from "@/utils/ui";
 
 /**
  * DOMRenderer 컴포넌트
@@ -44,17 +44,22 @@ const DOMRenderer: React.FC = () => {
       renderElement(childId)
     );
 
-    // 형제 요소들을 렌더링합니다.
-    const siblings = domElement.siblings.map((siblingId) =>
-      renderElement(siblingId)
-    );
-
     // blueprint가 있으면 blueprint에 해당하는 JSX를 렌더링합니다.
     if (blueprint) {
       try {
         // jsx_code가 있으면 해당 JSX를 렌더링합니다.
         if (blueprint.jsx_code) {
+          //{
+          // 'new_id': '72b0d5789ef8ad58411123c518842ace',
+          // 'target_id': 'root',
+          // 'jsx_code': "const CenteredWrapper = ({ children }) => {\n  return (\n    <div style={{\n      display: 'flex',\n      justifyContent: 'center',\n      alignItems: 'center',\n      width: '100%',\n      height: '100%'\n    }}>\n      {children}\n    </div>\n  );\n};",
+          // 'component_name': 'CenteredWrapper',
+          // 'imports': ["import React from 'react';"],
+          // 'styles': {'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'width': '100%', 'height': '100%'},
+          // 'attributes': {'children': '하위 컴포넌트들을 children prop으로 받아 렌더링합니다.'}
+          // }
           const Component = transpileJSX(blueprint);
+
           // 실제 프로덕션에서는 이 부분을 동적으로 JSX를 렌더링하는 방식으로 구현해야 합니다.
           // 여기서는 간단히 div로 감싸서 표현합니다.
           return <Component />;
@@ -85,7 +90,6 @@ const DOMRenderer: React.FC = () => {
         {...(blueprint?.attributes || {})}
       >
         {children}
-        {siblings}
       </div>
     );
   };

@@ -8,7 +8,6 @@ const UISelectModalFooter = () => {
   const { updateBlueprint, initDomStructure, updateDomStructure } =
     useBlueprintContext();
   const { modalState } = useModalContext<ElementGenerationParams>();
-  console.log(modalState);
   const add = () => {
     const { curElId } = modalState;
     const tagId = createRandomHash();
