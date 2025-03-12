@@ -72,8 +72,6 @@ const Main: React.FC = () => {
     });
   }, []);
 
-  console.log(domStructure);
-
   return (
     <div
       id="main_component"

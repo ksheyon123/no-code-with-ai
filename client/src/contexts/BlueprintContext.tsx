@@ -5,7 +5,7 @@ interface BlueprintContextType {
   blueprints: Map<string, Blueprint>;
   domStructure: Map<string, DOMStructureProps>;
   initBlueprint: (newId: string, params: Blueprint) => void;
-  updateBlueprint: (newId: string, curElId: string, config: Blueprint) => void;
+  updateBlueprint: (newId: string, params: Blueprint) => void;
   initDomStructure: (
     newId: string,
     params: { children: string[]; siblings: string[] }
@@ -59,23 +59,21 @@ export const BlueprintContextProvider: React.FC<
   /**
    *
    * @param newId 새로 생성되는 객체 ID
-   * @param curElId 새로 생성되는 객체의 부모요소 ID
-   * @param config 새로 생성되는 객체의 config
+   * @param params 새로 생성되는 객체의 config
    */
-  const updateBlueprint = (
-    newId: string,
-    curElId: string,
-    config: Blueprint
-  ) => {
-    const prevBlueprint = new Map(blueprints);
-    // const targetBlueprint = prevBlueprint.get(curElId);  // This wasn't being used
-
-    // Blueprint 추가
-    prevBlueprint.set(newId, config);
-    setBlueprints(prevBlueprint);
-
-    // Update the DOM structure to reflect the parent-child relationship
-    updateDomStructure(curElId, [newId]);
+  const updateBlueprint = (newId: string, params: Blueprint) => {
+    const curBlueprint = new Map(blueprints);
+    let targetBlueprint = curBlueprint.get(newId);
+    if (!targetBlueprint) {
+      curBlueprint.set(newId, params);
+    } else {
+      targetBlueprint = {
+        ...targetBlueprint,
+        ...params,
+      };
+      curBlueprint.set(newId, targetBlueprint);
+    }
+    setBlueprints(curBlueprint);
   };
 
   const initDomStructure = (

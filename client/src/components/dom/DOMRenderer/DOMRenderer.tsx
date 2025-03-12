@@ -1,6 +1,7 @@
 import React from "react";
 import { DOMStructureProps, Blueprint } from "@/types";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
+import { transpileJSX } from "@/utils/ui";
 
 /**
  * DOMRenderer 컴포넌트
@@ -53,24 +54,10 @@ const DOMRenderer: React.FC = () => {
       try {
         // jsx_code가 있으면 해당 JSX를 렌더링합니다.
         if (blueprint.jsx_code) {
+          const Component = transpileJSX(blueprint);
           // 실제 프로덕션에서는 이 부분을 동적으로 JSX를 렌더링하는 방식으로 구현해야 합니다.
           // 여기서는 간단히 div로 감싸서 표현합니다.
-          return (
-            <div
-              key={id}
-              id={id}
-              style={{
-                ...(blueprint.styles || {}),
-                position: "relative",
-              }}
-              {...(blueprint.attributes || {})}
-            >
-              {/* 실제로는 blueprint.jsx_code를 동적으로 렌더링해야 합니다 */}
-              <div dangerouslySetInnerHTML={{ __html: blueprint.jsx_code }} />
-              {children}
-              {siblings}
-            </div>
-          );
+          return <Component />;
         }
       } catch (error) {
         console.error(`Error rendering blueprint for ${id}:`, error);
@@ -84,8 +71,14 @@ const DOMRenderer: React.FC = () => {
         key={id}
         id={id}
         style={{
-          width: isRoot ? "100%" : 60,
-          height: isRoot ? "100%" : 60,
+          ...(isRoot && {
+            width: "100%",
+            height: "100%",
+          }),
+          ...(!isRoot && {
+            minWidth: 60,
+            minHeight: 60,
+          }),
           backgroundColor: isRoot ? "transparent" : "#cccccc",
           ...(blueprint?.styles || {}),
         }}

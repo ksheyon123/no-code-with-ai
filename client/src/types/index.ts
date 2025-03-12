@@ -25,7 +25,6 @@ export type ElementGenerationParams = {
 // 서버에서 제공하는 속성
 export type Blueprint = {
   new_id: string;
-  target_id: string;
   jsx_code: string;
   componentName: string;
   imports: string[];

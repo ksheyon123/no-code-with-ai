@@ -8,10 +8,9 @@ const UISelectModalFooter = () => {
   const { updateBlueprint, initDomStructure, updateDomStructure } =
     useBlueprintContext();
   const { modalState } = useModalContext<ElementGenerationParams>();
-
+  console.log(modalState);
   const add = () => {
     const { curElId } = modalState;
-    console.log("parentElId : ", curElId);
     const tagId = createRandomHash();
     updateDomStructure(curElId || "", [tagId]);
     initDomStructure(tagId, { children: [], siblings: [] });
@@ -23,15 +22,38 @@ const UISelectModalFooter = () => {
       },
       {
         onSuccess: ({ message }: { message: Blueprint }) => {
-          const { new_id, target_id } = message;
+          const { new_id } = message;
+          updateBlueprint(new_id, message);
         },
       }
     );
   };
 
+  const insert = () => {
+    const { parentElId } = modalState;
+    const tagId = createRandomHash();
+    updateDomStructure(parentElId || "", [tagId]);
+    initDomStructure(tagId, { children: [], siblings: [] });
+    generateArchitectureCode(
+      tagId,
+      modalState.parentElId!,
+      {
+        ...modalState,
+      },
+      {
+        onSuccess: ({ message }: { message: Blueprint }) => {
+          const { new_id } = message;
+          updateBlueprint(new_id, message);
+        },
+      }
+    );
+  };
+
+  const { radioType } = modalState;
+
   return (
     <>
-      <div onClick={add}>추가</div>
+      <div onClick={radioType === "0" ? add : insert}>확인</div>
     </>
   );
 };

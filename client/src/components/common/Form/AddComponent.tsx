@@ -4,7 +4,6 @@ import { ReactNode, useEffect } from "react";
 import Radio, { RadioGroup } from "../Radio";
 import { dropdownItems } from "@/constants";
 import InputWrapper from "@/components/common/Input/InputWrapper";
-import Input from "@/components/common/Input/Input";
 import TextArea from "@/components/common/TextArea/Textarea";
 import { ElementGenerationParams } from "@/types";
 
@@ -34,21 +33,20 @@ const AddComponent = ({ parentElId, curElId }: any) => {
       parentElId,
       curElId,
       type: dropdownItems[0].id,
+      radioType: "0",
     }));
   }, []);
   return (
-    <div style={{ minHeight: 400 }}>
+    <div style={{ minHeight: 400, maxHeight: 800 }}>
       <Wrapper label="요소">
         <RadioGroup
-          value={modalState.radioType}
-          onChange={(val) => {
-            setModalState((prev) => {
-              return {
-                ...prev,
-                radioType: val,
-              };
-            });
-          }}
+          value={modalState?.radioType || "0"}
+          onChange={(val) =>
+            setModalState((prev) => ({
+              ...prev,
+              radioType: val,
+            }))
+          }
           name="요소"
           children={[
             <Radio key="1" label="추가" name="추가" value="0" />,
@@ -60,25 +58,26 @@ const AddComponent = ({ parentElId, curElId }: any) => {
         <Dropdown
           defaultValue={dropdownItems[0].id}
           items={dropdownItems}
-          onClick={(e) => {
-            const { id } = e;
-            setModalState((prev) => {
-              return {
-                ...prev,
-                type: id,
-              };
-            });
-          }}
+          onClick={(e) =>
+            setModalState((prev) => ({
+              ...prev,
+              type: e.id,
+            }))
+          }
         />
       </Wrapper>
       <Wrapper label="Description">
         <InputWrapper>
-          <TextArea type="text" />
-        </InputWrapper>
-      </Wrapper>
-      <Wrapper label="Style">
-        <InputWrapper>
-          <TextArea type="text" />
+          <TextArea
+            type="text"
+            value={modalState.description || ""}
+            onChange={(data) =>
+              setModalState((prev) => ({
+                ...prev,
+                description: data.target.value,
+              }))
+            }
+          />
         </InputWrapper>
       </Wrapper>
     </div>
