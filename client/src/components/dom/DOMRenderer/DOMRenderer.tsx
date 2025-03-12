@@ -62,7 +62,7 @@ const DOMRenderer: React.FC = () => {
 
           // 실제 프로덕션에서는 이 부분을 동적으로 JSX를 렌더링하는 방식으로 구현해야 합니다.
           // 여기서는 간단히 div로 감싸서 표현합니다.
-          return <Component />;
+          return <Component key={blueprint.new_id}>{children}</Component>;
         }
       } catch (error) {
         console.error(`Error rendering blueprint for ${id}:`, error);

@@ -72,6 +72,8 @@ const Main: React.FC = () => {
     });
   }, []);
 
+  console.log(blueprints);
+
   return (
     <div
       id="main_component"

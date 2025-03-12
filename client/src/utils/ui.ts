@@ -8,13 +8,11 @@ const transpileJSX = ({ jsx_code, component_name, imports }: Blueprint) => {
     const fullCode = `
         ${jsx_code}
     `;
-    console.log("Full code:", fullCode);
 
     // JSX를 JavaScript로 변환
     const transformedCode = Babel.transform(fullCode, {
       presets: ["react"],
     });
-    console.log("Transformed code:", transformedCode.code);
 
     // 변환된 코드가 없으면 오류 처리
     if (!transformedCode.code) {
@@ -27,7 +25,6 @@ const transpileJSX = ({ jsx_code, component_name, imports }: Blueprint) => {
       "useState",
       `${transformedCode.code}; return ${component_name};`
     )(React, React.useState);
-    console.log("Created component:", dynamicComponent);
 
     // 유효한 컴포넌트인지 확인
     if (typeof dynamicComponent === "function") {

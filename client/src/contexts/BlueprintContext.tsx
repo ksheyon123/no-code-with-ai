@@ -1,5 +1,11 @@
 import { DOMStructureProps, Blueprint } from "@/types";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 
 interface BlueprintContextType {
   blueprints: Map<string, Blueprint>;
@@ -62,18 +68,20 @@ export const BlueprintContextProvider: React.FC<
    * @param params 새로 생성되는 객체의 config
    */
   const updateBlueprint = (newId: string, params: Blueprint) => {
-    const curBlueprint = new Map(blueprints);
-    let targetBlueprint = curBlueprint.get(newId);
-    if (!targetBlueprint) {
-      curBlueprint.set(newId, params);
-    } else {
-      targetBlueprint = {
-        ...targetBlueprint,
-        ...params,
-      };
-      curBlueprint.set(newId, targetBlueprint);
-    }
-    setBlueprints(curBlueprint);
+    setBlueprints((prevBlueprints) => {
+      const curBlueprint = new Map(prevBlueprints);
+      let targetBlueprint = curBlueprint.get(newId);
+      if (!targetBlueprint) {
+        curBlueprint.set(newId, params);
+      } else {
+        targetBlueprint = {
+          ...targetBlueprint,
+          ...params,
+        };
+        curBlueprint.set(newId, targetBlueprint);
+      }
+      return curBlueprint;
+    });
   };
 
   const initDomStructure = (
