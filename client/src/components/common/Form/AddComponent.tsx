@@ -1,35 +1,27 @@
-import Dropdown, { DropdownItem } from "@/components/common/Dropdown/Dropdown";
+import Dropdown from "@/components/common/Dropdown/Dropdown";
 import { useModalContext } from "@/contexts/ModalContext";
-import { createRandomHash } from "@/utils/crypto";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import Radio, { RadioGroup } from "../Radio";
+import { dropdownItems } from "@/constants";
+import InputWrapper from "@/components/common/Input/InputWrapper";
+import Input from "@/components/common/Input/Input";
+import TextArea from "@/components/common/TextArea/Textarea";
 
-const items: DropdownItem[] = [
-  {
-    id: "defaultwrapper",
-    label: "Wrapper",
-  },
-  {
-    id: "horizontal",
-    label: "Horizontal",
-  },
-  {
-    id: "vertical",
-    label: "Vertical",
-  },
-  {
-    id: "input",
-    label: "Input",
-  },
-  {
-    id: "button",
-    label: "Button",
-  },
-  {
-    id: "dropdown",
-    label: "Dropdown",
-  },
-];
+interface WrapperProps {
+  children: ReactNode;
+  label: string;
+}
+
+const Wrapper: React.FC<WrapperProps> = ({ label, children }) => {
+  return (
+    <div
+      style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}
+    >
+      <div style={{ width: "120px" }}>{label}</div>
+      <div style={{ flex: "1 1 0%" }}>{children}</div>
+    </div>
+  );
+};
 
 const AddComponent = ({ parentId, targetId }: any) => {
   const { modalState, setModalState } = useModalContext();
@@ -39,13 +31,13 @@ const AddComponent = ({ parentId, targetId }: any) => {
         ...prev,
         parentId,
         targetId,
-        type: items[0].id,
+        type: dropdownItems[0].id,
       };
     });
   }, []);
   return (
-    <div style={{ height: 400 }}>
-      <div>
+    <div style={{ minHeight: 400 }}>
+      <Wrapper label="요소">
         <RadioGroup
           value={modalState.radioType}
           onChange={(val) => {
@@ -62,12 +54,11 @@ const AddComponent = ({ parentId, targetId }: any) => {
             <Radio key="2" label="삽입" name="삽입" value="1" />,
           ]}
         />
-      </div>
-      <div>
-        <label>Component Type</label>
+      </Wrapper>
+      <Wrapper label="Component Type">
         <Dropdown
-          defaultValue={items[0].id}
-          items={items}
+          defaultValue={dropdownItems[0].id}
+          items={dropdownItems}
           onClick={(e) => {
             const { id } = e;
             setModalState((prev) => {
@@ -78,35 +69,17 @@ const AddComponent = ({ parentId, targetId }: any) => {
             });
           }}
         />
-      </div>
-      <div>
-        <label>Description</label>
-        <input
-          value={modalState?.description || ""}
-          onChange={(e) =>
-            setModalState((prev) => {
-              return {
-                ...prev,
-                description: e.target.value,
-              };
-            })
-          }
-        />
-      </div>
-      <div>
-        <label>Style</label>
-        <input
-          value={modalState?.style || ""}
-          onChange={(e) =>
-            setModalState((prev) => {
-              return {
-                ...prev,
-                style: e.target.value,
-              };
-            })
-          }
-        />
-      </div>
+      </Wrapper>
+      <Wrapper label="Description">
+        <InputWrapper>
+          <TextArea type="text" />
+        </InputWrapper>
+      </Wrapper>
+      <Wrapper label="Style">
+        <InputWrapper>
+          <TextArea type="text" />
+        </InputWrapper>
+      </Wrapper>
     </div>
   );
 };
