@@ -1,4 +1,5 @@
 import React, { RefObject, useEffect, useRef } from "react";
+import DOMRenderer from "@/components/dom/DOMRenderer/DOMRenderer";
 import AddComponent from "@/components/common/Form/AddComponent";
 import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UISelectModalFooter";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
@@ -71,13 +72,15 @@ const Main: React.FC = () => {
     });
   }, []);
 
+  console.log(domStructure);
+
   return (
     <div
       id="main_component"
       className="css_wrapper"
       ref={mainRef as RefObject<HTMLDivElement>}
     >
-      {/* {blueprints && <DOMRenderer items={blueprints} />} */}
+      <DOMRenderer />
     </div>
   );
 };

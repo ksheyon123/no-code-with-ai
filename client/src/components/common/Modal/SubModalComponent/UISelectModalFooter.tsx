@@ -10,7 +10,11 @@ const UISelectModalFooter = () => {
   const { modalState } = useModalContext<ElementGenerationParams>();
 
   const add = () => {
+    const { curElId } = modalState;
+    console.log("parentElId : ", curElId);
     const tagId = createRandomHash();
+    updateDomStructure(curElId || "", [tagId]);
+    initDomStructure(tagId, { children: [], siblings: [] });
     generateArchitectureCode(
       tagId,
       modalState.curElId!,
@@ -20,8 +24,6 @@ const UISelectModalFooter = () => {
       {
         onSuccess: ({ message }: { message: Blueprint }) => {
           const { new_id, target_id } = message;
-          initDomStructure(new_id, { children: [], siblings: [] });
-          updateDomStructure(target_id, [new_id]);
         },
       }
     );
