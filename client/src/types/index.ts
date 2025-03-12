@@ -20,29 +20,23 @@ export type ElementGenerationParams = {
   radioType?: string;
   parentElId?: string;
   curElId?: string;
-  targetId?: string;
 };
 
 // 서버에서 제공하는 속성
-export type ServerProvidedProps = {
-  jsx?: string;
-  componentName?: string;
-  imports?: string[];
+export type Blueprint = {
+  new_id: string;
+  target_id: string;
+  jsx_code: string;
+  componentName: string;
+  imports: string[];
   attributes?: Record<string, string | number | boolean>;
-  style?: Record<string, string | number>;
+  styles?: Record<string, string | number>;
 };
 
 // DOM 구조 관련 속성
 export type DOMStructureProps = {
-  children?: string[];
-  siblings?: string[];
+  children: string[];
+  siblings: string[];
 };
-
-// 최종 DOMBluePrint 타입
-export type DOMBluePrint = {
-  id: string;
-} & ElementGenerationParams &
-  ServerProvidedProps &
-  DOMStructureProps;
 
 export type DOMComponentFormat = {};

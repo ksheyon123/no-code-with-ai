@@ -1,5 +1,4 @@
 import { post } from "./https";
-import { DOMBluePrint } from "@/types";
 import { ResponseJSX } from "@/types/https";
 
 const sendArchitecture = async (params: any) =>

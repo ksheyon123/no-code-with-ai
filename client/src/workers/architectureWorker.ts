@@ -11,7 +11,8 @@ import { ElementGenerationParams } from "@/types";
 
 // 타입 정의
 interface ArchitectureRequest {
-  id: string;
+  newId: string;
+  targetId: string;
   params: ElementGenerationParams; // 아키텍처 청사진 데이터
   timestamp: number;
 }
@@ -45,27 +46,31 @@ async function processNextRequest() {
     // 진행 상태 알림
     self.postMessage({
       type: "PROGRESS",
-      requestId: request.id,
+      requestId: request.newId,
       payload: {
         status: "processing",
         message: "코드 생성 중...",
         progress: 0,
       },
     } as WorkerResponse);
-
+    const newParams = {
+      newId: request.newId,
+      targetId: request.targetId,
+      ...request.params,
+    };
     // 서버에 요청 전송
-    const { data } = await sendArchitecture(request.params);
+    const { data } = await sendArchitecture(newParams);
     // 결과 전송
     self.postMessage({
       type: "RESULT",
-      requestId: request.id,
+      requestId: request.newId,
       payload: data,
     } as WorkerResponse);
   } catch (error) {
     // 에러 전송
     self.postMessage({
       type: "ERROR",
-      requestId: request.id,
+      requestId: request.newId,
       payload: {
         message:
           error instanceof Error
@@ -103,13 +108,13 @@ function addRequest(request: ArchitectureRequest) {
  */
 function cancelRequest(requestId: string) {
   // 처리 중인 첫 번째 요청이 취소 대상이면 다음 요청으로 넘어감
-  if (requestQueue.length > 0 && requestQueue[0].id === requestId) {
+  if (requestQueue.length > 0 && requestQueue[0].newId === requestId) {
     requestQueue.shift();
     isProcessing = false;
     processNextRequest();
   } else {
     // 큐에서 해당 ID의 요청 제거
-    requestQueue = requestQueue.filter((req) => req.id !== requestId);
+    requestQueue = requestQueue.filter((req) => req.newId !== requestId);
   }
 }
 

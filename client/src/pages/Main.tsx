@@ -8,7 +8,7 @@ import { createRandomHash } from "@/utils/crypto";
 import { ElementGenerationParams } from "@/types";
 
 const Main: React.FC = () => {
-  const { blueprints, initBlueprint } = useBlueprintContext();
+  const { domStructure, blueprints, initDomStructure } = useBlueprintContext();
   const { openModal } = useModalContext<ElementGenerationParams>();
   const mainRef = useRef<HTMLDivElement>(null);
   // 키 이벤트 핸들러
@@ -65,12 +65,9 @@ const Main: React.FC = () => {
   }, [mainRef]);
 
   useEffect(() => {
-    const tagId = createRandomHash();
-    initBlueprint(tagId, {
-      style: {
-        width: "100%",
-        height: "100%",
-      },
+    initDomStructure("root", {
+      children: [],
+      siblings: [],
     });
   }, []);
 

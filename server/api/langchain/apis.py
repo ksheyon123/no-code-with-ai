@@ -128,6 +128,7 @@ def req_ui_component(request, format=None):
         architecture = request.body.decode('utf-8')
         print(f"원본 문자열 사용: {architecture}")
 
+    print("architecture", architecture)
     print("LangChain Model을 가져옵니다...")
     model = get_langchain_model()
     # 실제 LangChain 초기화 로직 호출
@@ -135,11 +136,15 @@ def req_ui_component(request, format=None):
     print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
     parser = JsonOutputParser()
     # JSON 스키마 형식 정의
-    format_instructions = '{{ "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요.", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
+    format_instructions = '{{ "new_id": "생성한 DOM 객체에 id={new_id}를 넣습니다.", "target_id": {target_id},  "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요.", "component_name": "ComponentName", "imports": ["필요한 import 문들"], "styles"?: "UI 생성에 필요한 style CSS Property", "attributes"?: "disabled, onFocus, onClick 등의 컴포넌트의 Property" }}' 
     example = """
-      jsx_code: "const ComponentName = () => {\n const [inputValue, setInputValue] = useState('');\n\n  const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };\n\n  return (\n    <div id={target_id} style={{display: 'flex'}}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} />\n      </div>\n      <button disabled={!inputValue}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>\n  );\n};",
-      component_name: "ComponentName",
-      imports: ["import React, { useState } from 'react';"],
+      "new_id" : ajksndalkwajdoansd,
+      "target_id" : lkasjjasldiwnmxals,
+      "jsx_code": "const ComponentName = () => {\n const [inputValue, setInputValue] = useState('');\n\n  const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };\n\n  return (\n    <div style={{display: 'flex'}}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} />\n      </div>\n      <button disabled={!inputValue}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>\n  );\n};",
+      "component_name": "ComponentName",
+      "imports": ["import React, { useState } from 'react';"],
+      "styles"?: {"width" : "100%", "height" : "100%"},
+      "attributes"?: {"onChange" : (data) => onChange(data) }
     """
     prompt_template = """
     You are an expert web developer. Create JSX code based on the given architecture.
@@ -161,12 +166,14 @@ def req_ui_component(request, format=None):
     print(f"Architecture 구조: {architecture}")
     
     # 딕셔너리에서 id 값 안전하게 추출
-    target_id = architecture.get('id', 'default_id')
-    print(f"Target ID: {target_id}")
+    new_id = architecture.get('newId', 'default_id')
+    target_id = architecture.get('targetId', 'default_id')
+    print(f"Target ID: {new_id}")
     
     response = chain.invoke({
         "architecture": architecture,
         "example" : example,
+        "new_id" : new_id,
         "target_id" : target_id,
         "format_instructions": format_instructions
     })

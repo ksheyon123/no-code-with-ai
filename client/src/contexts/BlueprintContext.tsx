@@ -1,10 +1,20 @@
-import { DOMBluePrint } from "@/types";
+import { DOMStructureProps, Blueprint } from "@/types";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface BlueprintContextType {
-  blueprints: Map<string, DOMBluePrint>;
-  initBlueprint: Function;
-  updateBlueprint: Function;
+  blueprints: Map<string, Blueprint>;
+  domStructure: Map<string, DOMStructureProps>;
+  initBlueprint: (newId: string, params: Blueprint) => void;
+  updateBlueprint: (newId: string, curElId: string, config: Blueprint) => void;
+  initDomStructure: (
+    newId: string,
+    params: { children: string[]; siblings: string[] }
+  ) => void;
+  updateDomStructure: (
+    newId: string,
+    children?: string[],
+    siblings?: string[]
+  ) => void;
 }
 
 const BlueprintContext = createContext<BlueprintContextType | undefined>(
@@ -28,35 +38,93 @@ interface BlueprintContextProviderProps {
 export const BlueprintContextProvider: React.FC<
   BlueprintContextProviderProps
 > = ({ children }) => {
-  const [blueprints, setBlueprints] = useState<Map<string, DOMBluePrint>>(
+  const [blueprints, setBlueprints] = useState<Map<string, Blueprint>>(
     new Map()
   );
+  const [domStructure, setDomStructure] = useState<
+    Map<string, DOMStructureProps>
+  >(new Map());
 
-  const initBlueprint = (newId: string, config: DOMBluePrint) => {
+  /**
+   *
+   * @param newId 새 blueprint의 ID
+   * @param config blueprint의 Configuration
+   */
+  const initBlueprint = (newId: string, params: Blueprint) => {
     const newBlueprints = new Map(blueprints);
-    newBlueprints.set(newId, config);
+    newBlueprints.set(newId, params);
     setBlueprints(newBlueprints);
   };
 
+  /**
+   *
+   * @param newId 새로 생성되는 객체 ID
+   * @param curElId 새로 생성되는 객체의 부모요소 ID
+   * @param config 새로 생성되는 객체의 config
+   */
   const updateBlueprint = (
     newId: string,
     curElId: string,
-    config: DOMBluePrint
+    config: Blueprint
   ) => {
     const prevBlueprint = new Map(blueprints);
-    const targetBlueprint = prevBlueprint.get(curElId);
-    // 객체의 children에 추가
-    if (targetBlueprint && targetBlueprint.children) {
-      targetBlueprint.children.push(newId);
-    }
+    // const targetBlueprint = prevBlueprint.get(curElId);  // This wasn't being used
+
     // Blueprint 추가
-    initBlueprint(newId, config);
+    prevBlueprint.set(newId, config);
+    setBlueprints(prevBlueprint);
+
+    // Update the DOM structure to reflect the parent-child relationship
+    updateDomStructure(curElId, [newId]);
+  };
+
+  const initDomStructure = (
+    newId: string,
+    params: { children: string[]; siblings: string[] }
+  ) => {
+    const curDomStructure = new Map(domStructure);
+    curDomStructure.set(newId, params);
+    setDomStructure(curDomStructure);
+  };
+
+  const updateDomStructure = (
+    targetId: string,
+    children?: string[],
+    siblings?: string[]
+  ) => {
+    const curDomStructure = new Map(domStructure);
+    const targetDomStructure = curDomStructure.get(targetId);
+
+    if (targetDomStructure) {
+      if (children) {
+        // Create a new array with the concatenated values
+        targetDomStructure.children = [
+          ...targetDomStructure.children,
+          ...children,
+        ];
+      }
+
+      if (siblings) {
+        // Create a new array with the concatenated values
+        targetDomStructure.siblings = [
+          ...targetDomStructure.siblings,
+          ...siblings,
+        ];
+      }
+
+      // Update the map with the modified structure
+      curDomStructure.set(targetId, targetDomStructure);
+      setDomStructure(curDomStructure);
+    }
   };
 
   const value = {
     initBlueprint,
     updateBlueprint,
+    initDomStructure,
+    updateDomStructure,
     blueprints,
+    domStructure,
   };
 
   return (
