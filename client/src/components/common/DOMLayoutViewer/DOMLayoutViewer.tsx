@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
+import { FaTrash } from "react-icons/fa";
 
 const DOMLayoutViewer: React.FC = () => {
   const { domStructure } = useBlueprintContext();
@@ -19,11 +20,29 @@ const DOMLayoutViewer: React.FC = () => {
 
     // 현재 요소 렌더링
     const elementLabel = (
-      <div key={id} style={{ marginBottom: "4px" }}>
+      <div
+        key={id}
+        style={{
+          marginBottom: "4px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <div style={{ whiteSpace: "pre" }}>
           {depth === 0 ? indent : spacing + indent}
           {id}
         </div>
+        <button
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "0",
+          }}
+        >
+          <FaTrash color="#ff6b6b" size={12} />
+        </button>
       </div>
     );
 

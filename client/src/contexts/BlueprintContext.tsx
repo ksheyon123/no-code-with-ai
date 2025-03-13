@@ -1,11 +1,5 @@
 import { DOMStructureProps, Blueprint } from "@/types";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
 interface BlueprintContextType {
   blueprints: Map<string, Blueprint>;
@@ -84,6 +78,8 @@ export const BlueprintContextProvider: React.FC<
     });
   };
 
+  const removeBlueprint = () => {};
+
   const initDomStructure = (
     newId: string,
     params: { children: string[]; siblings: string[] }
@@ -123,6 +119,8 @@ export const BlueprintContextProvider: React.FC<
       setDomStructure(curDomStructure);
     }
   };
+
+  const removeDomStructure = () => {};
 
   const value = {
     initBlueprint,
