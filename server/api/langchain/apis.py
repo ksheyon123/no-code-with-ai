@@ -4,6 +4,11 @@ from rest_framework.response import Response
 from utils.langchain import initialize_langchain, get_langchain_model, set_prompt
 from langchain_core.output_parsers import JsonOutputParser
 from typing import TypedDict, Dict, Any, Optional
+from langchain_core.runnables import RunnableLambda, RunnableSequence
+import json
+
+from prompt.image_parse_prompt import image_text_extract_format_instruction, image_text_extract_prompt, image_description_format_instruction, image_description_prompt, image_construct_format_instruction, image_construct_prompt
+from prompt.ui_create_prompt import ui_component_format_instructions, ui_component_example, ui_component_prompt
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -43,75 +48,6 @@ def req_simple_answer(request, format=None):
         'message': response
     })
 
-@api_view(['GET'])
-@permission_classes([permissions.AllowAny])
-def req_simple_architecture(request, format=None):
-    """
-    LangChain을 통해 architecture를 받아 JSX 코드를 JSON 형식으로 반환
-    """
-    architecture = [
-        {
-            "id": 1,
-            "type": "HorizontalWrapper",
-            "description": "이 컴포넌트는 DOM 객체를 수평으로 배열 합니다.",
-            "child":[
-                {
-                   "id": 2,
-                    "type": "VerticalWrapper",
-                    "description": "이 컴포넌트는 DOM 객체를 수직으로 배열 합니다.",
-                    "child" : [{
-                            "id": 4,
-                            "type": "label",
-                            "description": "label 텍스트를 표현합니다.",
-                        },
-                        {
-                            "id": 5,
-                            "type": "input",
-                            "description": "이 input 기능을 표현합니다.",
-                        },
-                    ]
-                },
-                {
-                   "id": 3,
-                    "type": "button",
-                    "description": "이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.",
-                }
-            ]
-        }   
-    ]
-
-    print("LangChain Model을 가져옵니다...")
-    model = get_langchain_model()
-    # 실제 LangChain 초기화 로직 호출
-
-    print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
-    parser = JsonOutputParser()
-    # JSON 스키마 형식 정의
-    format_instructions = '{{"jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요", "component_name": "ComponentName", "imports": ["필요한 import 문들"] }}' 
-    prompt_template = """
-    You are an expert web developer. Create JSX code based on the given architecture.
-    
-    Architecture: {architecture}
-    
-    1. Return Only JSON 
-    2. Return a JSON response with the following structure:
-    {format_instructions}
-    """
-    
-    prompt = set_prompt(prompt_template, ["architecture"], {"format_instructions": format_instructions})
-    print(prompt)
-    # 체인 구성
-    chain = prompt.pipe(model).pipe(parser)
-    response = chain.invoke({
-        "architecture": architecture,
-        "format_instructions": format_instructions
-    })
-    
-    return Response({
-        'status': 'Success',
-        'message': response
-    })
-
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def req_ui_component(request, format=None):
@@ -128,7 +64,6 @@ def req_ui_component(request, format=None):
         architecture = request.body.decode('utf-8')
         print(f"원본 문자열 사용: {architecture}")
 
-    print("architecture", architecture)
     print("LangChain Model을 가져옵니다...")
     model = get_langchain_model()
     # 실제 LangChain 초기화 로직 호출
@@ -136,53 +71,20 @@ def req_ui_component(request, format=None):
     print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
     parser = JsonOutputParser()
     # JSON 스키마 형식 정의
-    format_instructions = '{{ "new_id": "생성한 DOM 객체에 idnew를 넣습니다.", "html": "여기에 HTML 코드를 문자열로 넣어주세요.", "props" : "상위 컴포넌트에서 하위 컴포넌트로 전달하는 Property", "functions": "여기에 컴포넌트 내부에서 사용하는 로직을 Array 형식으로 넣어주세요.", "component_name": "ComponentName", "imports": ["필요한 import 문들"], "styles"?: "UI 생성에 필요한 style CSS Property", "attributes"?: "disabled, onFocus, onClick 등의 컴포넌트의 Property" }}' 
-    example = """
-      "new_id" : ajksndalkwajdoansd,
-      "target_id" : lkasjjasldiwnmxals,
-      "html": <div id={new_id} style={styles.container}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} style={styles.input} />\n      </div>\n      <button disabled={!inputValue} style={styles.button}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>",
-      "props" : { children, onSubmit },
-      "functions" : ["const [inputValue, setInputValue] = useState('');", "const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };"],
-      "component_name": "ComponentName",
-      "imports": ["import React, { useState } from 'react';"],
-      "styles"?: {"width" : "100%", "height" : "100%"},
-      "attributes"?: {"onChange" : (data) => onChange(data) }
-    """
-    prompt_template = """
-    You are an expert web developer. Create JSX code based on the given architecture.
-
-    Example : {example}
-
-    Architecture: {architecture}
     
-    New ID to use in HTML: {new_id}
-    
-    1. No "\n" (line break) in styles.
-    2. Return a Only JSON response (without description of response) with the following structure:
-    {format_instructions}
-    3. Make sure to use the provided new_id value ({new_id}) in your HTML code where id={new_id} is needed.
-    """
-    
-    prompt = set_prompt(prompt_template, ["architecture", "new_id"], {"format_instructions": format_instructions, "example": example})
-    print(prompt)
+    prompt = set_prompt(ui_component_prompt, ["architecture", "new_id"], {"format_instructions": ui_component_format_instructions, "example": ui_component_example})
     # 체인 구성
     chain = prompt.pipe(model).pipe(parser)
-    # architecture 구조 확인을 위한 디버깅 출력
-    print(f"Architecture 구조: {architecture}")
     
     # 딕셔너리에서 id 값 안전하게 추출
-    new_id = architecture.get('newId', 'default_id')
-    target_id = architecture.get('targetId', 'default_id')
-    print(f"Target ID: {new_id}")
+    new_id = architecture.get('newId', '')
     
     response = chain.invoke({
         "architecture": architecture,
-        "example" : example,
         "new_id" : new_id,
-        "target_id" : target_id,
-        "format_instructions": format_instructions
     })
-    print(response)
+    if 'html' in response:
+        print("A")
     
     return Response({
         'status': 'Success',
@@ -249,6 +151,155 @@ def req_parse_image(request, format=None):
     })
     print(response)
     
+    return Response({
+        'status': 'Success',
+        'message': response
+    })
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_analyze_image(request, format=None): 
+    """
+    LangChain을 통해 Image를 받아 컴포넌트를 추출
+    """
+
+    try:
+        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
+        import json
+        architecture: RequestImageDict = json.loads(request.body.decode('utf-8'))
+    except Exception as e:
+        print(f"JSON 파싱 오류: {e}")
+        # 오류 발생 시 원본 바이트 문자열 사용
+        architecture = request.body.decode('utf-8')
+        print(f"원본 문자열 사용: {architecture}")
+
+    print("LangChain Model을 가져옵니다...")
+    model = get_langchain_model()
+    # 실제 LangChain 초기화 로직 호출
+
+    print('Image 파싱을 위한 프롬프트를 작성합니다.')
+    parser = JsonOutputParser()
+
+    prompt = set_prompt(image_description_prompt, ["image_url"], {"format_instructions": image_description_format_instruction })
+    print(prompt)
+    # 체인 구성
+    chain = prompt.pipe(model).pipe(parser)
+
+    # 딕셔너리에서 id 값 안전하게 추출
+    base64_data = architecture.get('base64Data', '')
+    response = chain.invoke({
+        "image_url": "data:image/png;base64," + base64_data,
+        "format_instructions" : image_description_format_instruction,
+    })
+
+    return Response({
+        'status': 'Success',
+        'message': response
+    })
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_sample_runnables(request, format=None):
+
+    try:
+        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
+        import json
+        architecture: RequestImageDict = json.loads(request.body.decode('utf-8'))
+    except Exception as e:
+        print(f"JSON 파싱 오류: {e}")
+        # 오류 발생 시 원본 바이트 문자열 사용
+        architecture = request.body.decode('utf-8')
+        print(f"원본 문자열 사용: {architecture}")
+
+    model = get_langchain_model()
+
+    # 딕셔너리에서 id 값 안전하게 추출
+    base64_data = architecture.get('base64Data', '')
+    
+    # 클로저를 사용하여 base64_data를 캡처
+    def create_response_handler(base64_data):
+        print("data:image/png;base64," + base64_data)
+        def response_handler(result):
+            print("========= RESPONSE : ", result)
+            # AIMessage 객체에서 content를 추출
+            content = result.content if hasattr(result, 'content') else result
+            
+            # JSON 파싱을 시도하지 않고 content 문자열을 그대로 service_purpose로 사용
+            return {
+                "image_url": "data:image/png;base64," + base64_data,
+                "service_purpose": content
+            }
+        return response_handler
+    
+    # 클로저를 사용하여 response_handler 생성
+    response_handler = create_response_handler(base64_data)
+
+    prompt_0 = set_prompt(image_text_extract_prompt, ["image_url"], {"format_instructions": image_text_extract_format_instruction })
+    prompt_1 = set_prompt(image_description_prompt, ["image_url"], {"format_instructions": image_description_format_instruction })
+    prompt_2 = set_prompt(image_construct_prompt, ["image_url", "service_purpose"], {"format_instructions": image_construct_format_instruction })
+    
+    # 체인 구성 수정: model의 출력을 response_handler로 처리하고 종료
+    chain = (
+        RunnableLambda(lambda x: {"image_url": x["image_url"]})
+        .pipe(prompt_0)
+        .pipe(model)
+        .pipe(response_handler)
+    )
+    try:
+        response = chain.invoke({
+            "image_url": "data:image/png;base64," + base64_data,
+        })
+        print(response)
+        return Response({
+            'status': 'Success',
+            'message': response
+        })
+    except Exception as e:
+        print(f"req_sample_runnables 에서 에러 발생: {e}")
+        return Response({
+            'status': 'Error',
+            'message': str(e)
+        }, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_analyze_image_with_runnables(request, format=None): 
+    """
+    LangChain을 통해 Image를 받아 컴포넌트를 추출
+    """
+
+    try:
+        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
+        architecture: RequestImageDict = json.loads(request.body.decode('utf-8'))
+    except Exception as e:
+        print(f"JSON 파싱 오류: {e}")
+        # 오류 발생 시 원본 바이트 문자열 사용
+        architecture = request.body.decode('utf-8')
+        print(f"원본 문자열 사용: {architecture}")
+
+
+    print("LangChain Model을 가져옵니다...")
+    model = get_langchain_model()
+    # 실제 LangChain 초기화 로직 호출
+
+    print('Image 파싱을 위한 프롬프트를 작성합니다.')
+    parser = JsonOutputParser()
+
+    prompt = set_prompt(image_description_prompt, ["image_url"], {"format_instructions": image_description_format_instruction })
+    print(prompt)
+    # 체인 구성
+    chain = prompt.pipe(model).pipe(parser)
+
+    # 딕셔너리에서 id 값 안전하게 추출
+    base64_data = architecture.get('base64Data', '')
+    
+    response = chain.invoke({
+        "image_url": "data:image/png;base64," + base64_data,
+        "format_instructions" : image_description_format_instruction,
+    })
+
     return Response({
         'status': 'Success',
         'message': response
