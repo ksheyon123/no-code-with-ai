@@ -136,11 +136,13 @@ def req_ui_component(request, format=None):
     print('JSX 코드 생성을 위한 프롬프트를 설정합니다...')
     parser = JsonOutputParser()
     # JSON 스키마 형식 정의
-    format_instructions = '{{ "new_id": "생성한 DOM 객체에 id={new_id}를 넣습니다.", "target_id": {target_id},  "jsx_code": "여기에 JSX 코드를 문자열로 넣어주세요.", "component_name": "ComponentName", "imports": ["필요한 import 문들"], "styles"?: "UI 생성에 필요한 style CSS Property", "attributes"?: "disabled, onFocus, onClick 등의 컴포넌트의 Property" }}' 
+    format_instructions = '{{ "new_id": "생성한 DOM 객체에 idnew를 넣습니다.", "html": "여기에 HTML 코드를 문자열로 넣어주세요.", "props" : "상위 컴포넌트에서 하위 컴포넌트로 전달하는 Property", "functions": "여기에 컴포넌트 내부에서 사용하는 로직을 Array 형식으로 넣어주세요.", "component_name": "ComponentName", "imports": ["필요한 import 문들"], "styles"?: "UI 생성에 필요한 style CSS Property", "attributes"?: "disabled, onFocus, onClick 등의 컴포넌트의 Property" }}' 
     example = """
       "new_id" : ajksndalkwajdoansd,
       "target_id" : lkasjjasldiwnmxals,
-      "jsx_code": "const ComponentName = () => {\n const [inputValue, setInputValue] = useState('');\n\n  const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };\n\n  return (\n    <div id="ajksndalkwajdoansd" style={{display: 'flex'}}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} />\n      </div>\n      <button disabled={!inputValue}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>\n  );\n};",
+      "html": <div id={new_id} style={styles.container}>\n      <div>\n        <label>label 텍스트를 표현합니다.</label>\n        <input value={inputValue} onChange={handleInputChange} style={styles.input} />\n      </div>\n      <button disabled={!inputValue} style={styles.button}>\n        이 button 컴포넌트를 표현합니다. default는 disabled input 값이 있으면 abled 됩니다.\n      </button>\n    </div>",
+      "props" : { children, onSubmit },
+      "functions" : ["const [inputValue, setInputValue] = useState('');", "const handleInputChange = (e) => {\n    setInputValue(e.target.value);\n  };"],
       "component_name": "ComponentName",
       "imports": ["import React, { useState } from 'react';"],
       "styles"?: {"width" : "100%", "height" : "100%"},
@@ -153,12 +155,15 @@ def req_ui_component(request, format=None):
 
     Architecture: {architecture}
     
-    1. Return Only JSON 
-    2. Return a JSON response with the following structure:
+    New ID to use in HTML: {new_id}
+    
+    1. No "\n" (line break) in styles.
+    2. Return a Only JSON response (without description of response) with the following structure:
     {format_instructions}
+    3. Make sure to use the provided new_id value ({new_id}) in your HTML code where id={new_id} is needed.
     """
     
-    prompt = set_prompt(prompt_template, ["architecture"], {"format_instructions": format_instructions})
+    prompt = set_prompt(prompt_template, ["architecture", "new_id"], {"format_instructions": format_instructions, "example": example})
     print(prompt)
     # 체인 구성
     chain = prompt.pipe(model).pipe(parser)
