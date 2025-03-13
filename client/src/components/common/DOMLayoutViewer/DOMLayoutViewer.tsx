@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { FaTrash } from "react-icons/fa";
+import Drawer from "../Drawer/Drawer";
 
 const DOMLayoutViewer: React.FC = () => {
   const { domStructure } = useBlueprintContext();
@@ -9,7 +10,6 @@ const DOMLayoutViewer: React.FC = () => {
   const renderElement = (id: string, depth: number = 0): React.ReactNode => {
     // domStructure에서 해당 ID의 요소 정보를 가져옵니다.
     const domElement = domStructure.get(id);
-
     // 요소가 없으면 null을 반환합니다.
     if (!domElement) {
       return null;
@@ -29,9 +29,18 @@ const DOMLayoutViewer: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <div style={{ whiteSpace: "pre" }}>
+        <div style={{ display: "flex", whiteSpace: "pre" }}>
           {depth === 0 ? indent : spacing + indent}
-          {id}
+          <div
+            style={{
+              width: 120,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {id}
+          </div>
         </div>
         <button
           style={{
@@ -53,8 +62,7 @@ const DOMLayoutViewer: React.FC = () => {
 
     return (
       <React.Fragment key={id}>
-        {elementLabel}
-        {children}
+        <Drawer title={elementLabel} children={children} />
       </React.Fragment>
     );
   };

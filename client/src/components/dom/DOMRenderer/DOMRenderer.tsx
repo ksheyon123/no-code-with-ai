@@ -47,7 +47,7 @@ const DOMRenderer: React.FC = () => {
     if (blueprint) {
       try {
         // jsx_code가 있으면 해당 JSX를 렌더링합니다.
-        if (blueprint.jsx_code) {
+        if (blueprint.html) {
           //{
           // 'new_id': '72b0d5789ef8ad58411123c518842ace',
           // 'target_id': 'root',

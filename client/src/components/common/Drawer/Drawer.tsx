@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 
 export interface IDrawerProps {
   /**
    * Drawer의 제목
    */
-  title?: string;
+  title?: string | ReactNode;
   /**
    * Drawer의 초기 열림 상태
    * @default false

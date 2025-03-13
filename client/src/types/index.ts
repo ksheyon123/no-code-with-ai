@@ -25,9 +25,11 @@ export type ElementGenerationParams = {
 // 서버에서 제공하는 속성
 export type Blueprint = {
   new_id: string;
-  jsx_code: string;
+  html: string;
+  functions: string[];
   component_name: string;
   imports: string[];
+  props?: string;
   attributes?: Record<string, string | number | boolean>;
   styles?: Record<string, string | number>;
 };

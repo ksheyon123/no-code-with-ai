@@ -2,12 +2,27 @@ import React from "react";
 import * as Babel from "@babel/standalone";
 import { Blueprint } from "@/types";
 
-const transpileJSX = ({ jsx_code, component_name, imports }: Blueprint) => {
+const transpileJSX = ({
+  html,
+  functions,
+  component_name,
+  styles,
+  props,
+  imports,
+}: Blueprint) => {
   try {
     // 컴포넌트 코드만 사용 (import 문은 제외)
     const fullCode = `
-        ${jsx_code}
+      const ${component_name} = (${props && props}) => {
+
+        const styles = ${JSON.stringify(styles)}
+        ${functions.join("\n")}
+        return (
+          ${html}
+        )
+      }
     `;
+    console.log("Full code : ", fullCode);
 
     // JSX를 JavaScript로 변환
     const transformedCode = Babel.transform(fullCode, {
