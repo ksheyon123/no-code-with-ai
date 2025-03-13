@@ -27,9 +27,9 @@ const uploadImage = async (imageData: {
   fileSize: number;
 }) =>
   post(
-    `http://localhost:8000/api/langchain/req_parse_image`,
+    `http://localhost:8000/api/langchain/req_sample_runnables`,
     imageData,
-    { timeout: 30000 } // 30초 타임아웃
+    { timeout: 60000 } // 30초 타임아웃
   );
 
 export { sendArchitecture, uploadImage };
