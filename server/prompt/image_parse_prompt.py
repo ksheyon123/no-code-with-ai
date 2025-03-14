@@ -1,7 +1,7 @@
 image_text_extract_format_instruction = '''
-{
+{{
   "extracted_text": ["All visible text elements found in the image, listed exactly as they appear"]
-}
+}}
 '''
 
 image_text_extract_prompt = '''
@@ -25,12 +25,12 @@ Respond with ONLY a JSON object following this structure without any additional 
 '''
 
 image_description_format_instruction = '''
-{
+{{
   "service_purpose": "Clear description of the exact type of page/screen shown (login, signup, dashboard, etc.)",
   "ui_components": ["List of specific UI elements visible in the interface (buttons, forms, fields, etc.)"],
   "functionality": "Precise description of what user actions are possible on this screen",
   "language_elements": ["Any text or labels visible in the interface"]
-}
+}}
 '''
 
 image_description_prompt = """

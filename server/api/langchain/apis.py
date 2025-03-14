@@ -3,12 +3,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from utils.langchain import initialize_langchain, get_langchain_model, set_prompt
 from langchain_core.output_parsers import JsonOutputParser
-from typing import TypedDict, Dict, Any, Optional
-from langchain_core.runnables import RunnableLambda, RunnableSequence
+from typing import Dict, Any, Optional
 import json
 
 from prompt.image_parse_prompt import image_text_extract_format_instruction, image_text_extract_prompt, image_description_format_instruction, image_description_prompt, image_construct_format_instruction, image_construct_prompt
 from prompt.ui_create_prompt import ui_component_format_instructions, ui_component_example, ui_component_prompt
+from .types import RequestImageDict
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -23,29 +23,6 @@ def init_langchain(request, format=None):
     return Response({
         'status': 'Success',
         'message': 'LangChain initialized successfully'
-    })
-
-@api_view(['GET'])
-@permission_classes([permissions.AllowAny])
-def req_simple_answer(request, format=None):
-    """
-    LangChain 간단한 Prompt 작성
-    """
-    print("LangChain Model을 가져옵니다...")
-    model = get_langchain_model()
-    # 실제 LangChain 초기화 로직 호출
-
-    print('간단한 질문을 수행합니다...')
-
-    prompt = set_prompt('You are kind AI. If the user ask you, you will answer.')
-    # prompt.from_template("Tell me a joke about {topic}")
-    chain = prompt.pipe(model)
-    response = chain.invoke({
-        "topic" : "banana"
-    })
-    return Response({
-        'status': 'Success',
-        'message': response
     })
 
 @api_view(['POST'])
@@ -90,12 +67,6 @@ def req_ui_component(request, format=None):
         'status': 'Success',
         'message': response
     })
-
-class RequestImageDict(TypedDict):
-    filename: str
-    fileType: str
-    base64Data: str
-    filesize: str
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -196,71 +167,6 @@ def req_analyze_image(request, format=None):
         'status': 'Success',
         'message': response
     })
-
-
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-def req_sample_runnables(request, format=None):
-
-    try:
-        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
-        import json
-        architecture: RequestImageDict = json.loads(request.body.decode('utf-8'))
-    except Exception as e:
-        print(f"JSON 파싱 오류: {e}")
-        # 오류 발생 시 원본 바이트 문자열 사용
-        architecture = request.body.decode('utf-8')
-        print(f"원본 문자열 사용: {architecture}")
-
-    model = get_langchain_model()
-
-    # 딕셔너리에서 id 값 안전하게 추출
-    base64_data = architecture.get('base64Data', '')
-    
-    # 클로저를 사용하여 base64_data를 캡처
-    def create_response_handler(base64_data):
-        print("data:image/png;base64," + base64_data)
-        def response_handler(result):
-            print("========= RESPONSE : ", result)
-            # AIMessage 객체에서 content를 추출
-            content = result.content if hasattr(result, 'content') else result
-            
-            # JSON 파싱을 시도하지 않고 content 문자열을 그대로 service_purpose로 사용
-            return {
-                "image_url": "data:image/png;base64," + base64_data,
-                "service_purpose": content
-            }
-        return response_handler
-    
-    # 클로저를 사용하여 response_handler 생성
-    response_handler = create_response_handler(base64_data)
-
-    prompt_0 = set_prompt(image_text_extract_prompt, ["image_url"], {"format_instructions": image_text_extract_format_instruction })
-    prompt_1 = set_prompt(image_description_prompt, ["image_url"], {"format_instructions": image_description_format_instruction })
-    prompt_2 = set_prompt(image_construct_prompt, ["image_url", "service_purpose"], {"format_instructions": image_construct_format_instruction })
-    
-    # 체인 구성 수정: model의 출력을 response_handler로 처리하고 종료
-    chain = (
-        RunnableLambda(lambda x: {"image_url": x["image_url"]})
-        .pipe(prompt_0)
-        .pipe(model)
-        .pipe(response_handler)
-    )
-    try:
-        response = chain.invoke({
-            "image_url": "data:image/png;base64," + base64_data,
-        })
-        print(response)
-        return Response({
-            'status': 'Success',
-            'message': response
-        })
-    except Exception as e:
-        print(f"req_sample_runnables 에서 에러 발생: {e}")
-        return Response({
-            'status': 'Error',
-            'message': str(e)
-        }, status=500)
 
 
 @api_view(['POST'])

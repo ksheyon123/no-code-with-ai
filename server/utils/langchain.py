@@ -66,5 +66,35 @@ def set_prompt(template, input_variables=None, partial_variables=None) :
         input_variables=input_variables,
         partial_variables=partial_variables
     )
+
+
+def set_chat_prompt(messages, input_variables=None, partial_variables=None) :
+    """
+        ChatPromptTemplate 생성 메소드
+        https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html#chatprompttemplate
+
+        template = ChatPromptTemplate([
+            ("system", "You are a helpful AI bot. Your name is {name}."),
+            ("human", "Hello, how are you doing?"),
+            ("ai", "I'm doing well, thanks!"),
+            ("human", "{user_input}"),
+        ])
+
+        prompt_value = template.invoke(
+            {
+                "name": "Bob",
+                "user_input": "What is your name?"
+            }
+        )
+        
+    """
+
+    # input_variables와 partial_variables 타입 검사 및 기본값 설정
+    if input_variables is None or not isinstance(input_variables, list):
+        input_variables = []
+    if partial_variables is None or not isinstance(partial_variables, dict):
+        partial_variables = {}
+
+    return ChatPromptTemplate(messages=messages, input_variables=input_variables, partial_variables=partial_variables)
     
 
