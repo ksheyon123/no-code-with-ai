@@ -11,6 +11,8 @@ from prompt.image_parse_prompt import image_text_extract_format_instruction, ima
 from ..types import RequestImageDict
 
 from utils.hugging_face import extract_text_from_base64_image
+from utils.webpage_analyzer import WebpageAnalyzer
+from utils.ui_component_detector import detect_ui_components
 
 
 @api_view(['GET'])
@@ -107,12 +109,13 @@ def req_sample_analyze_image(request, format=None):
     # 딕셔너리에서 id 값 안전하게 추출
     base64_data = architecture.get('base64Data', '')
     # 실제 LangChain 초기화 로직 호출
-    texts = extract_text_from_base64_image(base64_data)
-    print(texts)
+    # texts = extract_text_from_base64_image(base64_data)
+    analyzer = WebpageAnalyzer()
+    results = analyzer.analyze_webpage(base64_data, True)
     
     return Response({
         'status': 'Success',
-        'message': texts
+        'message': results
     })
 
 @api_view(['POST'])

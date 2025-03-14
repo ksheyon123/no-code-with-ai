@@ -14,5 +14,10 @@ langchain-text-splitters==0.3.6
 pydantic-settings==2.8.1
 
 # HuggingFace 관련 패키지 
-torch-2.6.0
-transformers-4.49.0
+torch==2.6.0
+transformers==4.49.0
+torchvision==0.21.0
+
+# 이미지 처리 관련 패키지
+opencv-python==4.9.0.80
+tensorflow==2.19.0
