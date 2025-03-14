@@ -1,12 +1,13 @@
 from django.urls import path, include
 from . import apis
-from .tests.test_apis import req_sample_chat, req_sample_answer, req_sample_runnables
+from .tests.test_apis import req_sample_chat, req_sample_answer, req_sample_analyze_image, req_sample_runnables
 
 urlpatterns = [
     # 테스트 API
     path('req_sample_chat', req_sample_chat),
     path('req_sample_answer', req_sample_answer),
     path('req_sample_runnables', req_sample_runnables),
+    path('req_sample_analyze_image', req_sample_analyze_image),
 
     # 실제 API
     path('init_langchain', apis.init_langchain),

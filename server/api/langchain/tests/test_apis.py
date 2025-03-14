@@ -10,6 +10,8 @@ from typing import Dict, Any, Optional
 from prompt.image_parse_prompt import image_text_extract_format_instruction, image_text_extract_prompt, image_description_format_instruction, image_description_prompt, image_construct_format_instruction, image_construct_prompt
 from ..types import RequestImageDict
 
+from utils.hugging_face import extract_text_from_base64_image
+
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -83,6 +85,34 @@ def req_sample_answer(request, format=None):
     return Response({
         'status': 'Success',
         'message': response
+    })
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_sample_analyze_image(request, format=None):
+    """
+    LangChain 간단한 Prompt 작성
+    """
+
+    try:
+        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
+        import json
+        architecture: RequestImageDict = json.loads(request.body.decode('utf-8'))
+    except Exception as e:
+        print(f"JSON 파싱 오류: {e}")
+        # 오류 발생 시 원본 바이트 문자열 사용
+        architecture = request.body.decode('utf-8')
+        print(f"원본 문자열 사용: {architecture}")
+
+    # 딕셔너리에서 id 값 안전하게 추출
+    base64_data = architecture.get('base64Data', '')
+    # 실제 LangChain 초기화 로직 호출
+    texts = extract_text_from_base64_image(base64_data)
+    print(texts)
+    
+    return Response({
+        'status': 'Success',
+        'message': texts
     })
 
 @api_view(['POST'])
