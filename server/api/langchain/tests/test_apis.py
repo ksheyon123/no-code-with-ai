@@ -3,7 +3,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from utils.langchain import get_langchain_model, set_chat_prompt, set_prompt
 
-from langchain_core.runnables import RunnableLambda, RunnableSequence
+from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnableSequence
 from langchain_core.output_parsers import JsonOutputParser
 from typing import Dict, Any, Optional
 
@@ -13,6 +13,7 @@ from ..types import RequestImageDict
 from utils.hugging_face import extract_text_from_base64_image
 from utils.webpage_analyzer import WebpageAnalyzer
 from utils.ui_component_detector import detect_ui_components
+from utils.resnet_50_prediction import predict_from_base64
 
 
 @api_view(['GET'])
@@ -120,7 +121,7 @@ def req_sample_analyze_image(request, format=None):
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
-def req_sample_runnables(request, format=None):
+def req_sample_runnables_sequence(request, format=None):
 
     try:
         # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
@@ -181,3 +182,81 @@ def req_sample_runnables(request, format=None):
             'status': 'Error',
             'message': str(e)
         }, status=500)
+    
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_sample_runnables_parallel(request, format=None):
+    model = get_langchain_model()
+    
+    # 프롬프트 정의 - JsonOutputParser 사용하지 않음
+    joke_prompt = set_prompt("tell me a joke about {topic}", ["topic"])
+    poem_prompt = set_prompt("write a 2-line poem about {topic}", ["topic"])
+    
+    # 후처리 함수 정의 - 직접 텍스트 처리
+    def post_process(result):
+        # AIMessage 객체에서 content를 추출
+        joke_content = result["joke"].content if hasattr(result["joke"], "content") else result["joke"]
+        poem_content = result["poem"].content if hasattr(result["poem"], "content") else result["poem"]
+        
+        # 결과를 통합된 형식으로 변환
+        return {
+            "unified_result": {
+                "topic": "orange",
+                "responses": [
+                    {
+                        "type": "joke",
+                        "content": joke_content
+                    },
+                    {
+                        "type": "poem",
+                        "content": poem_content
+                    }
+                ],
+                "timestamp": "2025-03-17T11:52:00+09:00"
+            }
+        }
+    
+    # RunnableParallel 결과를 RunnableLambda로 후처리
+    chain = RunnableParallel(
+        joke=(joke_prompt.pipe(model)),
+        poem=(poem_prompt.pipe(model))
+    ).pipe(RunnableLambda(post_process))
+    
+    try:
+        response = chain.invoke({
+            "topic": "orange",
+        })
+        return Response({
+            'status': 'Success',
+            'message': response
+        })
+    except Exception as e:
+        print(f"req_sample_runnables 에서 에러 발생: {e}")
+        return Response({
+            'status': 'Error',
+            'message': str(e)
+        }, status=500)    
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_sample_resnet_50_predict(request, format=None):
+
+    try:
+        # request.body는 바이트 문자열이므로 디코딩 후 JSON으로 파싱
+        import json
+        architecture: RequestImageDict = json.loads(request.body.decode('utf-8'))
+    except Exception as e:
+        print(f"JSON 파싱 오류: {e}")
+        # 오류 발생 시 원본 바이트 문자열 사용
+        architecture = request.body.decode('utf-8')
+        print(f"원본 문자열 사용: {architecture}")
+
+    # 딕셔너리에서 id 값 안전하게 추출
+    base64_data = architecture.get('base64Data', '')
+    response = predict_from_base64(base64_data)
+    return Response({
+        'status' : 'success',
+        'message' : response
+    })

@@ -26,7 +26,15 @@ def initialize_langchain():
         raise ValueError("ANTHROPIC_API_KEY가 설정되지 않았습니다. .env 파일에 유효한 API 키를 설정해주세요.")
     
     # ChatAnthropic 모델 초기화
-    _langchain_model = ChatAnthropic(model="claude-3-opus-20240229")
+    # https://python.langchain.com/docs/concepts/chat_models/
+    _langchain_model = ChatAnthropic(
+            model="claude-3-5-sonnet-20240620", 
+            api_key=api_key,
+            # temperature=0,
+            # max_tokens=1024,
+            # timeout=None,
+            # max_retries=2,
+        )
     
     return _langchain_model
 
