@@ -6,6 +6,8 @@ from utils.langchain import get_langchain_model, set_chat_prompt, set_prompt
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnableSequence
 from langchain_core.output_parsers import JsonOutputParser
 from typing import Dict, Any, Optional
+import json
+from datetime import datetime
 
 from prompt.image_parse_prompt import image_text_extract_format_instruction, image_text_extract_prompt, image_description_format_instruction, image_description_prompt, image_construct_format_instruction, image_construct_prompt
 from ..types import RequestImageDict
@@ -260,3 +262,229 @@ def req_sample_resnet_50_predict(request, format=None):
         'status' : 'success',
         'message' : response
     })
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_fortune_telling_parallel(request, format=None):
+    """
+    LangChain을 통해 일일, 주간, 월간, 년간 사주풀이를 병렬로 처리하는 API
+    JSON 형식으로 응답을 반환합니다.
+    """
+    try:
+        # 요청 데이터 파싱
+        user_data = json.loads(request.body.decode('utf-8'))
+        user_info = user_data.get('user_info', '')
+        
+        print("LangChain Model을 가져옵니다...")
+        model = get_langchain_model()
+        
+        # JSON 출력 파서 정의
+        parser = JsonOutputParser()
+        
+        # 일일 사주풀이 프롬프트 (JSON 형식 지정)
+        daily_format_instructions = """
+        다음 JSON 형식으로 응답해주세요:
+        [
+            {
+                "label": "대인관계",
+                "message": "대인관계에 대한 사주풀이 내용",
+                "key": "relationship"
+            },
+            {
+                "label": "일과 학업",
+                "message": "일과 학업에 대한 사주풀이 내용",
+                "key": "work"
+            },
+            {
+                "label": "금전운",
+                "message": "금전운에 대한 사주풀이 내용",
+                "key": "money"
+            },
+            {
+                "label": "건강",
+                "message": "건강에 대한 사주풀이 내용",
+                "key": "health"
+            },
+            {
+                "label": "오늘의 조언",
+                "message": "오늘의 조언 내용",
+                "key": "advice"
+            },
+            {
+                "label": "오늘의 색상",
+                "message": "오늘의 색상 내용",
+                "key": "color"
+            },
+            {
+                "label": "오늘의 음식",
+                "message": "오늘의 음식 내용",
+                "key": "food"
+            }
+        ]
+        """
+        
+        # 주간 사주풀이 프롬프트 (JSON 형식 지정)
+        weekly_format_instructions = """
+        다음 JSON 형식으로 응답해주세요:
+        [
+            {
+                "label": "대인관계",
+                "message": "이번 주 대인관계에 대한 사주풀이 내용",
+                "key": "relationship"
+            },
+            {
+                "label": "일과 학업",
+                "message": "이번 주 일과 학업에 대한 사주풀이 내용",
+                "key": "work"
+            },
+            {
+                "label": "금전운",
+                "message": "이번 주 금전운에 대한 사주풀이 내용",
+                "key": "money"
+            },
+            {
+                "label": "건강",
+                "message": "이번 주 건강에 대한 사주풀이 내용",
+                "key": "health"
+            },
+            {
+                "label": "이번 주 조언",
+                "message": "이번 주 조언 내용",
+                "key": "advice"
+            }
+        ]
+        """
+        
+        # 월간 사주풀이 프롬프트 (JSON 형식 지정)
+        monthly_format_instructions = """
+        다음 JSON 형식으로 응답해주세요:
+        [
+            {
+                "label": "대인관계",
+                "message": "이번 달 대인관계에 대한 사주풀이 내용",
+                "key": "relationship"
+            },
+            {
+                "label": "일과 학업",
+                "message": "이번 달 일과 학업에 대한 사주풀이 내용",
+                "key": "work"
+            },
+            {
+                "label": "금전운",
+                "message": "이번 달 금전운에 대한 사주풀이 내용",
+                "key": "money"
+            },
+            {
+                "label": "건강",
+                "message": "이번 달 건강에 대한 사주풀이 내용",
+                "key": "health"
+            },
+            {
+                "label": "이번 달 조언",
+                "message": "이번 달 조언 내용",
+                "key": "advice"
+            }
+        ]
+        """
+        
+        # 년간 사주풀이 프롬프트 (JSON 형식 지정)
+        yearly_format_instructions = """
+        다음 JSON 형식으로 응답해주세요:
+        [
+            {
+                "label": "대인관계",
+                "message": "올해 대인관계에 대한 사주풀이 내용",
+                "key": "relationship"
+            },
+            {
+                "label": "일과 학업",
+                "message": "올해 일과 학업에 대한 사주풀이 내용",
+                "key": "work"
+            },
+            {
+                "label": "금전운",
+                "message": "올해 금전운에 대한 사주풀이 내용",
+                "key": "money"
+            },
+            {
+                "label": "건강",
+                "message": "올해 건강에 대한 사주풀이 내용",
+                "key": "health"
+            },
+            {
+                "label": "올해의 조언",
+                "message": "올해의 조언 내용",
+                "key": "advice"
+            }
+        ]
+        """
+        
+        # 각 사주풀이 유형별 프롬프트 정의
+        daily_prompt = set_prompt("다음 정보를 바탕으로 오늘의 사주풀이를 해주세요. {format_instructions} 사용자 정보: {user_info}", 
+                                ["user_info"], {"format_instructions": daily_format_instructions})
+        
+        weekly_prompt = set_prompt("다음 정보를 바탕으로 이번 주의 사주풀이를 해주세요. {format_instructions} 사용자 정보: {user_info}", 
+                                 ["user_info"], {"format_instructions": weekly_format_instructions})
+        
+        monthly_prompt = set_prompt("다음 정보를 바탕으로 이번 달의 사주풀이를 해주세요. {format_instructions} 사용자 정보: {user_info}", 
+                                  ["user_info"], {"format_instructions": monthly_format_instructions})
+        
+        yearly_prompt = set_prompt("다음 정보를 바탕으로 올해의 사주풀이를 해주세요. {format_instructions} 사용자 정보: {user_info}", 
+                                 ["user_info"], {"format_instructions": yearly_format_instructions})
+        
+        # 후처리 함수 정의
+        def post_process(result):
+            # 각 사주풀이 결과 추출 및 JSON 파싱
+            try:
+                # 각 결과가 이미 JSON 문자열이거나 객체인 경우 처리
+                daily_content = result["daily"].content if hasattr(result["daily"], "content") else result["daily"]
+                weekly_content = result["weekly"].content if hasattr(result["weekly"], "content") else result["weekly"]
+                monthly_content = result["monthly"].content if hasattr(result["monthly"], "content") else result["monthly"]
+                yearly_content = result["yearly"].content if hasattr(result["yearly"], "content") else result["yearly"]
+                
+                # 현재 시간 포맷팅
+                current_time = datetime.now().isoformat()
+                
+                # 결과를 통합된 형식으로 변환
+                return {
+                    "fortune_telling": {
+                        "user_info": user_info,
+                        "results": {
+                            "daily": daily_content,
+                            "weekly": weekly_content,
+                            "monthly": monthly_content,
+                            "yearly": yearly_content
+                        },
+                        "timestamp": current_time
+                    }
+                }
+            except Exception as e:
+                print(f"JSON 파싱 오류: {e}")
+                return {
+                    "error": f"결과 처리 중 오류 발생: {str(e)}"
+                }
+        
+        # 병렬 처리 체인 구성
+        chain = RunnableParallel(
+            daily=(daily_prompt.pipe(model).pipe(parser)),
+            weekly=(weekly_prompt.pipe(model).pipe(parser)),
+            monthly=(monthly_prompt.pipe(model).pipe(parser)),
+            yearly=(yearly_prompt.pipe(model).pipe(parser))
+        ).pipe(RunnableLambda(post_process))
+        
+        # 체인 실행
+        print(f"사주풀이 병렬 처리를 시작합니다. 사용자 정보: {user_info}")
+        response = chain.invoke({
+            "user_info": user_info,
+        })
+        
+        return Response({
+            'status': 'Success',
+            'message': response
+        })
+    except Exception as e:
+        print(f"사주풀이 병렬 처리 중 에러 발생: {e}")
+        return Response({
+            'status': 'Error',
+            'message': str(e)
+        }, status=500)
