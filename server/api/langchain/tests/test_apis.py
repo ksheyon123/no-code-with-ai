@@ -9,6 +9,12 @@ from typing import Dict, Any, Optional
 import json
 from datetime import datetime
 
+# LangChain Tools 관련 임포트
+from langchain.tools import BaseTool, StructuredTool, tool
+from langchain_core.tools import Tool
+from langchain.agents import AgentExecutor, create_react_agent
+from langchain_core.prompts import PromptTemplate
+
 from prompt.image_parse_prompt import image_text_extract_format_instruction, image_text_extract_prompt, image_description_format_instruction, image_description_prompt, image_construct_format_instruction, image_construct_prompt
 from ..types import RequestImageDict
 
@@ -262,6 +268,78 @@ def req_sample_resnet_50_predict(request, format=None):
         'status' : 'success',
         'message' : response
     })
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def req_sample_tools(request, format=None):
+    """
+    LangChain Tools를 사용한 간단한 계산기 예제
+    """
+    print("LangChain Model을 가져옵니다...")
+    model = get_langchain_model()
+    
+    # 계산기 도구 정의
+    @tool
+    def calculator(expression: str) -> str:
+        """
+        문자열로 된 수학 표현식을 계산합니다.
+        
+        Args:
+            expression: 계산할 수학 표현식 (예: "2 + 2", "3 * 4", "10 / 2")
+            
+        Returns:
+            계산 결과를 문자열로 반환
+        """
+        try:
+            # eval은 보안상 위험할 수 있으나 예제 목적으로 사용
+            result = eval(expression)
+            return f"계산 결과: {expression} = {result}"
+        except Exception as e:
+            return f"계산 오류: {str(e)}"
+    
+    # 에이전트 프롬프트 템플릿
+    prompt = PromptTemplate.from_template(
+        """당신은 수학 문제를 해결하는 도우미입니다.
+        
+        주어진 도구를 사용하여 사용자의 수학 문제를 해결하세요.
+        
+        {tools}
+        
+        도구 이름: {tool_names}
+        
+        사용자 질문: {input}
+        
+        해결 과정을 단계별로 보여주세요:
+        
+        {agent_scratchpad}
+        """
+    )
+    
+    # 에이전트 생성
+    agent = create_react_agent(model, [calculator], prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=[calculator], verbose=True)
+    
+    # 에이전트 실행
+    try:
+        math_problem = request.GET.get('problem', '2 + 2')
+        print(f"수학 문제 해결을 시작합니다: {math_problem}")
+        
+        response = agent_executor.invoke({
+            "input": f"다음 수학 문제를 계산해주세요: {math_problem}"
+        })
+        
+        return Response({
+            'status': 'Success',
+            'problem': math_problem,
+            'solution': response['output']
+        })
+    except Exception as e:
+        print(f"계산기 도구 사용 중 에러 발생: {e}")
+        return Response({
+            'status': 'Error',
+            'message': str(e)
+        }, status=500)
+
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
