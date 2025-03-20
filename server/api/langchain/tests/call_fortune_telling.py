@@ -82,8 +82,8 @@ def compare_fortune_telling_apis():
     # print("\n\n===== 항목별 병렬 처리 API 호출 (각 항목별로 별도 프롬프트) =====")
     # call_fortune_telling_api(api_type='by_item')
     
-    print("\n\n===== 통합 프롬프트 API 호출 (일간, 주간, 월간, 년간 한 번에 요청) =====")
-    call_fortune_telling_api(api_type='combined')
+    # print("\n\n===== 통합 프롬프트 API 호출 (일간, 주간, 월간, 년간 한 번에 요청) =====")
+    # call_fortune_telling_api(api_type='combined')
 
 if __name__ == "__main__":
     # 단일 API 호출

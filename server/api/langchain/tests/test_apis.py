@@ -820,10 +820,12 @@ def req_fortune_telling_combined(request, format=None):
         """
         
         # 통합 사주풀이 프롬프트 정의
-        combined_prompt = set_prompt(
-            "다음 정보를 바탕으로 오늘, 이번 주, 이번 달, 올해의 사주풀이를 한 번에 해주세요. "
-            "각 기간별로 대인관계, 일과 학업, 금전운, 건강, 조언 등의 항목에 대한 운세를 제공해주세요. "
-            "{format_instructions} 사용자 정보: {user_info}", 
+        combined_prompt = set_prompt("""
+            다음 정보를 바탕으로 일간, 주간, 월간, 연간의 사주풀이를 해주세요. 
+            반드시 daily, weekly, monthly, yearly 모든 항목에 대한 결과를 포함해야 합니다.
+            각 기간별로 대인관계, 일과 학업, 금전운, 건강, 조언 등의 항목에 대한 운세를 제공해주세요. 
+            {format_instructions} 사용자 정보: {user_info}
+            """,
             ["user_info"], 
             {"format_instructions": combined_format_instructions}
         )

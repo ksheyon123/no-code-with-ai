@@ -32,7 +32,7 @@ def initialize_langchain():
             model="claude-3-5-sonnet-20240620", 
             api_key=api_key,
             # temperature=0,
-            # max_tokens=1024,
+            max_tokens=4000
             # timeout=None,
             # max_retries=2,
         )
