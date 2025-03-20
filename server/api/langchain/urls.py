@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import apis
-from .tests.test_apis import req_sample_chat, req_sample_answer, req_sample_analyze_image, req_sample_runnables_parallel, req_sample_runnables_sequence, req_sample_resnet_50_predict, req_fortune_telling_parallel, req_fortune_telling_parallel_by_item, req_sample_tools_with_agent, req_sample_tools_simple
+from .tests.test_apis import req_sample_chat, req_sample_answer, req_sample_analyze_image, req_sample_runnables_parallel, req_sample_runnables_sequence, req_sample_resnet_50_predict, req_fortune_telling_parallel, req_fortune_telling_parallel_by_item, req_fortune_telling_combined, req_sample_tools_with_agent, req_sample_tools_simple
 
 urlpatterns = [
     # 테스트 API
@@ -12,6 +12,7 @@ urlpatterns = [
     path('req_sample_resnet_50_predict', req_sample_resnet_50_predict),
     path('req_fortune_telling_parallel', req_fortune_telling_parallel),
     path('req_fortune_telling_parallel_by_item', req_fortune_telling_parallel_by_item),
+    path('req_fortune_telling_combined', req_fortune_telling_combined),
     path('req_sample_tools_with_agent', req_sample_tools_with_agent),
     path('req_sample_tools_simple', req_sample_tools_simple),
 

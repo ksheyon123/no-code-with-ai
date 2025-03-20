@@ -2,18 +2,24 @@ import requests
 import json
 import time
 
-def call_fortune_telling_api(by_item=False):
+def call_fortune_telling_api(api_type='parallel'):
     """
     사주풀이 API를 호출하고 응답을 출력하는 함수
     
     Args:
-        by_item (bool): True이면 항목별 병렬 처리 API를 호출, False이면 기존 병렬 처리 API를 호출
+        api_type (str): 호출할 API 유형
+            - 'parallel': 기존 병렬 처리 API (일간, 주간, 월간, 년간 별도 프롬프트)
+            - 'by_item': 항목별 병렬 처리 API (각 항목별로 별도 프롬프트)
+            - 'combined': 통합 프롬프트 API (일간, 주간, 월간, 년간 한 번에 요청)
     """
     # API 엔드포인트 URL
-    if by_item:
+    if api_type == 'by_item':
         url = 'http://localhost:8000/api/langchain/req_fortune_telling_parallel_by_item'
         print("항목별 병렬 처리 API 호출 중...")
-    else:
+    elif api_type == 'combined':
+        url = 'http://localhost:8000/api/langchain/req_fortune_telling_combined'
+        print("통합 프롬프트 API 호출 중...")
+    else:  # 'parallel'
         url = 'http://localhost:8000/api/langchain/req_fortune_telling_parallel'
         print("기존 병렬 처리 API 호출 중...")
     
@@ -68,18 +74,22 @@ def call_fortune_telling_api(by_item=False):
 
 def compare_fortune_telling_apis():
     """
-    두 가지 사주풀이 API의 성능을 비교하는 함수
+    세 가지 사주풀이 API의 성능을 비교하는 함수
     """
-    # print("===== 기존 병렬 처리 API 호출 =====")
-    # call_fortune_telling_api(by_item=False)
+    print("===== 기존 병렬 처리 API 호출 (일간, 주간, 월간, 년간 별도 프롬프트) =====")
+    call_fortune_telling_api(api_type='parallel')
     
-    print("\n\n===== 항목별 병렬 처리 API 호출 =====")
-    call_fortune_telling_api(by_item=True)
+    # print("\n\n===== 항목별 병렬 처리 API 호출 (각 항목별로 별도 프롬프트) =====")
+    # call_fortune_telling_api(api_type='by_item')
+    
+    print("\n\n===== 통합 프롬프트 API 호출 (일간, 주간, 월간, 년간 한 번에 요청) =====")
+    call_fortune_telling_api(api_type='combined')
 
 if __name__ == "__main__":
     # 단일 API 호출
-    # call_fortune_telling_api(by_item=False)  # 기존 API 호출
-    # call_fortune_telling_api(by_item=True)   # 새 API 호출
+    # call_fortune_telling_api(api_type='parallel')  # 기존 병렬 처리 API 호출
+    # call_fortune_telling_api(api_type='by_item')   # 항목별 병렬 처리 API 호출
+    # call_fortune_telling_api(api_type='combined')  # 통합 프롬프트 API 호출
     
-    # 두 API 비교
+    # 모든 API 비교
     compare_fortune_telling_apis()
