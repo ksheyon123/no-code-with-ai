@@ -190,6 +190,220 @@ def req_sample_runnables_sequence(request, format=None):
             'status': 'Error',
             'message': str(e)
         }, status=500)
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def req_fortune_telling_parallel_by_item(request, format=None):
+    """
+    LangChain을 통해 일일, 주간, 월간, 년간 사주풀이를 항목별로 병렬 처리하는 API
+    각 기간(일간, 주간, 월간, 년간)의 개별 항목(대인관계, 일과학업, 금전운 등)별로 요청해서 합치는 방식
+    JSON 형식으로 응답을 반환합니다.
+    토큰 사용량 및 비용 정보도 함께 제공합니다.
+    """
+    try:
+        # 요청 데이터 파싱
+        user_data = json.loads(request.body.decode('utf-8'))
+        user_info = user_data.get('user_info', '')
+        
+        print("LangChain Model을 가져옵니다...")
+        model = get_langchain_model()
+        model_name = model.model_name if hasattr(model, 'model_name') else "claude-3-5-sonnet-20240620"
+        
+        # JSON 출력 파서 정의
+        parser = JsonOutputParser()
+        
+        # 항목 정의
+        items = {
+            "daily": [
+                {"key": "relationship", "label": "대인관계"},
+                {"key": "work", "label": "일과 학업"},
+                {"key": "money", "label": "금전운"},
+                {"key": "health", "label": "건강"},
+                {"key": "advice", "label": "오늘의 조언"},
+                {"key": "color", "label": "오늘의 색상"},
+                {"key": "food", "label": "오늘의 음식"}
+            ],
+            "weekly": [
+                {"key": "relationship", "label": "대인관계"},
+                {"key": "work", "label": "일과 학업"},
+                {"key": "money", "label": "금전운"},
+                {"key": "health", "label": "건강"},
+                {"key": "advice", "label": "이번 주 조언"}
+            ],
+            "monthly": [
+                {"key": "relationship", "label": "대인관계"},
+                {"key": "work", "label": "일과 학업"},
+                {"key": "money", "label": "금전운"},
+                {"key": "health", "label": "건강"},
+                {"key": "advice", "label": "이번 달 조언"}
+            ],
+            "yearly": [
+                {"key": "relationship", "label": "대인관계"},
+                {"key": "work", "label": "일과 학업"},
+                {"key": "money", "label": "금전운"},
+                {"key": "health", "label": "건강"},
+                {"key": "advice", "label": "올해의 조언"}
+            ]
+        }
+        
+        # 기간별 접두사 정의
+        period_prefixes = {
+            "daily": "오늘의",
+            "weekly": "이번 주",
+            "monthly": "이번 달",
+            "yearly": "올해"
+        }
+        
+        # 프롬프트 및 체인 생성 함수
+        def create_item_prompt(period, item):
+            period_text = {"daily": "오늘", "weekly": "이번 주", "monthly": "이번 달", "yearly": "올해"}[period]
+            format_instructions = f"""
+            RETURN ONLY JSON!
+            NO DESCRIPTION ABOUT CREATED MESSAGE!
+            다음 JSON 형식으로 응답해주세요:
+            {{
+                "label": "{item['label']}",
+                "message": "{period_prefixes[period]} {item['label']}에 대한 사주풀이 내용",
+                "key": "{item['key']}"
+            }}
+            """
+            
+            prompt_text = f"다음 정보를 바탕으로 {period_text}의 {item['label']}에 대한 사주풀이를 해주세요. {{format_instructions}} 사용자 정보: {{user_info}}"
+            prompt = set_prompt(prompt_text, ["user_info"], {"format_instructions": format_instructions})
+            return prompt.pipe(model).pipe(parser)
+        
+        # 모든 항목에 대한 병렬 체인 구성
+        parallel_chains = {}
+        
+        # 각 기간의 각 항목에 대한 체인 생성
+        for period, period_items in items.items():
+            for item in period_items:
+                chain_key = f"{period}_{item['key']}"
+                parallel_chains[chain_key] = create_item_prompt(period, item)
+        
+        # 후처리 함수 정의
+        def post_process(result):
+            try:
+                # 결과 정리
+                processed_results = {
+                    "daily": [],
+                    "weekly": [],
+                    "monthly": [],
+                    "yearly": []
+                }
+                
+                # 토큰 사용량 계산을 위한 구조
+                token_usage = {
+                    "daily": {},
+                    "weekly": {},
+                    "monthly": {},
+                    "yearly": {}
+                }
+                
+                # 각 결과 처리
+                for key, value in result.items():
+                    period, item_key = key.split('_', 1)
+                    
+                    # 결과 추출
+                    content = value.content if hasattr(value, "content") else value
+                    
+                    # 결과가 문자열인 경우 JSON으로 파싱
+                    if isinstance(content, str):
+                        try:
+                            content = json.loads(content)
+                        except:
+                            # JSON 파싱 실패 시 원본 유지
+                            pass
+                    
+                    # 결과 추가
+                    processed_results[period].append(content)
+                    
+                    # 토큰 사용량 계산
+                    token_usage[period][item_key] = get_token_usage_from_response(value)
+                
+                # 현재 시간 포맷팅
+                current_time = datetime.now().isoformat()
+                
+                # 토큰 사용량 합계 계산
+                period_totals = {}
+                for period, usage in token_usage.items():
+                    period_input_tokens = sum(item_usage.get('input_tokens', 0) for item_usage in usage.values())
+                    period_output_tokens = sum(item_usage.get('output_tokens', 0) for item_usage in usage.values())
+                    period_totals[period] = {
+                        'input_tokens': period_input_tokens,
+                        'output_tokens': period_output_tokens,
+                        'total_tokens': period_input_tokens + period_output_tokens
+                    }
+                
+                # 총 토큰 사용량 계산
+                total_input_tokens = sum(period_total.get('input_tokens', 0) for period_total in period_totals.values())
+                total_output_tokens = sum(period_total.get('output_tokens', 0) for period_total in period_totals.values())
+                total_tokens = total_input_tokens + total_output_tokens
+                
+                # 비용 계산
+                cost = estimate_token_cost({
+                    'input_tokens': total_input_tokens,
+                    'output_tokens': total_output_tokens
+                }, model_name)
+                
+                # 결과를 통합된 형식으로 변환
+                return {
+                    "fortune_telling": {
+                        "user_info": user_info,
+                        "results": {
+                            "daily": processed_results["daily"],
+                            "weekly": processed_results["weekly"],
+                            "monthly": processed_results["monthly"],
+                            "yearly": processed_results["yearly"]
+                        },
+                        "timestamp": current_time,
+                        "token_usage": {
+                            "by_item": token_usage,
+                            "by_period": period_totals,
+                            "total": {
+                                "input_tokens": total_input_tokens,
+                                "output_tokens": total_output_tokens,
+                                "total_tokens": total_tokens
+                            },
+                            "cost": cost
+                        }
+                    }
+                }
+            except Exception as e:
+                print(f"결과 처리 중 오류 발생: {e}")
+                return {
+                    "error": f"결과 처리 중 오류 발생: {str(e)}"
+                }
+        
+        # 병렬 처리 체인 구성
+        chain = RunnableParallel(**parallel_chains).pipe(RunnableLambda(post_process))
+        
+        # 체인 실행
+        print(f"사주풀이 항목별 병렬 처리를 시작합니다. 사용자 정보: {user_info}")
+        start_time = datetime.now()
+        response = chain.invoke({
+            "user_info": user_info,
+        })
+        end_time = datetime.now()
+        execution_time = (end_time - start_time).total_seconds()
+        
+        # 실행 시간 정보 추가
+        if "fortune_telling" in response:
+            response["fortune_telling"]["execution_time"] = {
+                "seconds": execution_time,
+                "formatted": f"{execution_time:.2f}초"
+            }
+        
+        return Response({
+            'status': 'Success',
+            'message': response
+        })
+    except Exception as e:
+        print(f"사주풀이 항목별 병렬 처리 중 에러 발생: {e}")
+        return Response({
+            'status': 'Error',
+            'message': str(e)
+        }, status=500)
     
 
 
