@@ -271,7 +271,7 @@ def req_sample_resnet_50_predict(request, format=None):
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
-def req_sample_tools(request, format=None):
+def req_sample_tools_with_agent(request, format=None):
     """
     LangChain Tools를 사용한 간단한 계산기 예제
     """
@@ -340,6 +340,125 @@ def req_sample_tools(request, format=None):
             'message': str(e)
         }, status=500)
 
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def req_sample_tools_simple(request, format=None):
+    """
+    LangChain Tools를 사용한 간단한 계산기 예제 (Agent 없이 직접 Tool 사용)
+    변수가 포함된 수식도 처리 가능 (예: "x+y=? (x=1, y=2)")
+    """
+    print("LangChain Model을 가져옵니다...")
+    model = get_langchain_model()
+    
+    # 계산기 도구 정의
+    @tool
+    def calculator(expression: str) -> str:
+        """
+        문자열로 된 수학 표현식을 계산합니다.
+        
+        Args:
+            expression: 계산할 수학 표현식 (예: "2 + 2", "3 * 4", "10 / 2")
+            
+        Returns:
+            계산 결과를 문자열로 반환
+        """
+        try:
+            # eval은 보안상 위험할 수 있으나 예제 목적으로 사용
+            result = eval(expression)
+            return f"{expression} = {result}"
+        except Exception as e:
+            return f"계산 오류: {str(e)}"
+    
+    # 변수 추출 및 수식 계산 도구
+    @tool
+    def variable_calculator(problem: str) -> str:
+        """
+        변수가 포함된 수학 문제를 계산합니다.
+        
+        Args:
+            problem: 변수가 포함된 수학 문제 (예: "x+y=? (x=1, y=2)")
+            
+        Returns:
+            계산 결과를 문자열로 반환
+        """
+        try:
+            # 수식과 변수 부분 분리
+            import re
+            
+            # 변수 값 추출 (예: x=1, y=2)
+            variables = {}
+            var_matches = re.findall(r'([a-zA-Z]+)=([0-9.]+)', problem)
+            for var_name, var_value in var_matches:
+                variables[var_name] = float(var_value)
+            
+            # 수식 부분 추출 (예: x+y=?)
+            equation_match = re.search(r'([^(]+)', problem)
+            if equation_match:
+                equation = equation_match.group(1).strip()
+                # "=?" 부분 제거
+                equation = equation.replace("=?", "").strip()
+                
+                # 변수 값 대입
+                for var_name, var_value in variables.items():
+                    equation = equation.replace(var_name, str(var_value))
+                
+                # 계산 실행
+                result = eval(equation)
+                
+                # 원래 수식과 변수 값, 계산 결과 반환
+                var_str = ", ".join([f"{var}={val}" for var, val in variables.items()])
+                return f"{equation_match.group(1).strip()} (여기서 {var_str}) = {result}"
+            else:
+                return f"수식 형식 오류: {problem}"
+        except Exception as e:
+            return f"계산 오류: {str(e)}"
+    
+    # 프롬프트 정의 - 계산기 도구의 결과를 받아 응답 생성
+    prompt = set_chat_prompt([
+        ("system", """당신은 수학 문제를 해결하는 도우미입니다.
+        계산 결과를 바탕으로 친절하고 명확한 답변을 제공하세요.
+        계산 과정과 결과를 포함하여 설명해주세요.
+        변수가 포함된 수식이라면 각 변수의 값과 대입 과정을 설명해주세요.
+        """),
+        ("human", "다음 수학 문제를 계산했습니다: {problem}\n결과: {calculation_result}\n이 계산 결과에 대해 설명해주세요.")
+    ], ["problem", "calculation_result"])
+    
+    try:
+        # 요청에서 수학 문제 가져오기
+        math_problem = request.GET.get('problem', 'x+y=? (x=1, y=2)')
+        print(f"수학 문제 해결을 시작합니다: {math_problem}")
+        
+        # 1. 적절한 계산기 도구 선택 및 호출
+        if '=' in math_problem and any(c.isalpha() for c in math_problem):
+            # 변수가 포함된 수식인 경우
+            calculation_result = variable_calculator.invoke(math_problem)
+        else:
+            # 일반 수식인 경우
+            calculation_result = calculator.invoke(math_problem)
+            
+        print(f"계산 결과: {calculation_result}")
+        
+        # 2. 계산 결과를 바탕으로 LLM에 설명 요청
+        chain = prompt.pipe(model)
+        response = chain.invoke({
+            "problem": math_problem,
+            "calculation_result": calculation_result
+        })
+        
+        # 3. 최종 응답 반환
+        return Response({
+            'status': 'Success',
+            'problem': math_problem,
+            'calculation': calculation_result,
+            'explanation': response.content if hasattr(response, 'content') else response
+        })
+    except Exception as e:
+        print(f"계산기 도구 사용 중 에러 발생: {e}")
+        return Response({
+            'status': 'Error',
+            'message': str(e)
+        }, status=500)
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
