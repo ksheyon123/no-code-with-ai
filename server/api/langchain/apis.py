@@ -55,13 +55,10 @@ def req_ui_component(request, format=None):
     
     # 딕셔너리에서 id 값 안전하게 추출
     new_id = architecture.get('newId', '')
-    
     response = chain.invoke({
         "architecture": architecture,
         "new_id" : new_id,
     })
-    if 'html' in response:
-        print("A")
     
     return Response({
         'status': 'Success',
