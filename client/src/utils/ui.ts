@@ -3,6 +3,7 @@ import * as Babel from "@babel/standalone";
 import { Blueprint } from "@/types";
 
 const transpileJSX = ({
+  new_id,
   html,
   functions,
   component_name,
@@ -13,12 +14,12 @@ const transpileJSX = ({
   try {
     // 컴포넌트 코드만 사용 (import 문은 제외)
     const fullCode = `
-      const ${component_name} = (${props && props}) => {
+      const ${component_name} = (${props}) => {
 
         const styles = ${JSON.stringify(styles)}
         ${functions.join("\n")}
         return (
-          ${html}
+          ${html.replace("new_id", '"' + new_id + '"')}
         )
       }
     `;

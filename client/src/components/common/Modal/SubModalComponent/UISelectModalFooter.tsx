@@ -2,6 +2,7 @@ import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
 import { ElementGenerationParams, Blueprint } from "@/types";
 import { createRandomHash } from "@/utils/crypto";
+import { transpileJSX } from "@/utils/ui";
 import { generateArchitectureCode } from "@/workers/architectureWorkerManager";
 
 const UISelectModalFooter = () => {
@@ -22,7 +23,8 @@ const UISelectModalFooter = () => {
       {
         onSuccess: ({ message }: { message: Blueprint }) => {
           const { new_id } = message;
-          updateBlueprint(new_id, message);
+          const TranspiledComponent = transpileJSX(message);
+          updateBlueprint(new_id, message, TranspiledComponent);
         },
       }
     );
@@ -42,7 +44,8 @@ const UISelectModalFooter = () => {
       {
         onSuccess: ({ message }: { message: Blueprint }) => {
           const { new_id } = message;
-          updateBlueprint(new_id, message);
+          const TranspiledComponent = transpileJSX(message);
+          updateBlueprint(new_id, message, TranspiledComponent);
         },
       }
     );

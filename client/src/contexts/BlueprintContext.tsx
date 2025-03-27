@@ -5,7 +5,11 @@ interface BlueprintContextType {
   blueprints: Map<string, Blueprint>;
   domStructure: Map<string, DOMStructureProps>;
   initBlueprint: (newId: string, params: Blueprint) => void;
-  updateBlueprint: (newId: string, params: Blueprint) => void;
+  updateBlueprint: (
+    newId: string,
+    params: Blueprint,
+    TranspiledComponent?: ReactNode
+  ) => void;
   initDomStructure: (
     newId: string,
     params: { children: string[]; siblings: string[] }
@@ -61,16 +65,26 @@ export const BlueprintContextProvider: React.FC<
    * @param newId 새로 생성되는 객체 ID
    * @param params 새로 생성되는 객체의 config
    */
-  const updateBlueprint = (newId: string, params: Blueprint) => {
+  const updateBlueprint = (
+    newId: string,
+    params: Blueprint,
+    TranspiledComponent?: any
+  ) => {
+    console.log(" TranspiledComponent : ", TranspiledComponent);
     setBlueprints((prevBlueprints) => {
       const curBlueprint = new Map(prevBlueprints);
       let targetBlueprint = curBlueprint.get(newId);
       if (!targetBlueprint) {
-        curBlueprint.set(newId, params);
+        let tempParams = {
+          ...params,
+          TranspiledComponent,
+        };
+        curBlueprint.set(newId, tempParams);
       } else {
         targetBlueprint = {
           ...targetBlueprint,
           ...params,
+          TranspiledComponent,
         };
         curBlueprint.set(newId, targetBlueprint);
       }

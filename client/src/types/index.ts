@@ -12,6 +12,8 @@
  * @property {Record<string, string | number>} [style] - DOM 객체의 스타일
  */
 
+import { ReactNode } from "react";
+
 // 사용자 입력 관련 속성
 export type ElementGenerationParams = {
   type: string;
@@ -32,6 +34,7 @@ export type Blueprint = {
   props?: string;
   attributes?: Record<string, string | number | boolean>;
   styles?: Record<string, string | number>;
+  TranspiledComponent?: any;
 };
 
 // DOM 구조 관련 속성

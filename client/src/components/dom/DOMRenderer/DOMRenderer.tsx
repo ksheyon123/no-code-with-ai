@@ -46,8 +46,10 @@ const DOMRenderer: React.FC = () => {
     // blueprint가 있으면 blueprint에 해당하는 JSX를 렌더링합니다.
     if (blueprint) {
       try {
+        console.log(blueprint);
         // jsx_code가 있으면 해당 JSX를 렌더링합니다.
-        if (blueprint.html) {
+        if (blueprint.TranspiledComponent) {
+          const { TranspiledComponent } = blueprint;
           //{
           // 'new_id': '72b0d5789ef8ad58411123c518842ace',
           // 'target_id': 'root',
@@ -57,9 +59,11 @@ const DOMRenderer: React.FC = () => {
           // 'styles': {'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'width': '100%', 'height': '100%'},
           // 'attributes': {'children': '하위 컴포넌트들을 children prop으로 받아 렌더링합니다.'}
           // }
-          const Component = transpileJSX(blueprint);
-
-          return <Component key={blueprint.new_id}>{children}</Component>;
+          return (
+            <TranspiledComponent key={blueprint.new_id}>
+              {children}
+            </TranspiledComponent>
+          );
         }
       } catch (error) {
         console.error(`Error rendering blueprint for ${id}:`, error);

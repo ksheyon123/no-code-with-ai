@@ -4,13 +4,11 @@ import AddComponent from "@/components/common/Form/AddComponent";
 import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UISelectModalFooter";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
-import { worker } from "@/workers/architectureWorkerManager";
-import { createRandomHash } from "@/utils/crypto";
 import { ElementGenerationParams } from "@/types";
 import DOMLayoutViewer from "@/components/common/DOMLayoutViewer/DOMLayoutViewer";
 
 const Main: React.FC = () => {
-  const { domStructure, blueprints, initDomStructure } = useBlueprintContext();
+  const { initDomStructure } = useBlueprintContext();
   const { openModal } = useModalContext<ElementGenerationParams>();
   const mainRef = useRef<HTMLDivElement>(null);
   // 키 이벤트 핸들러
@@ -72,9 +70,6 @@ const Main: React.FC = () => {
       siblings: [],
     });
   }, []);
-
-  // console.log("domStructure : ", domStructure);
-  console.log("blueprints : ", blueprints);
 
   return (
     <>
