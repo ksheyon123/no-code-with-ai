@@ -9,6 +9,7 @@ import InputWrapper from "@/components/common/Input/InputWrapper";
 import Input from "@/components/common/Input/Input";
 import { useModalContext } from "@/contexts/ModalContext";
 import AddComponent from "@/components/common/Form/AddComponent";
+import LNB from "@/components/common/LNB/LNB";
 
 const UI: React.FC = () => {
   const { openModal } = useModalContext();
@@ -34,6 +35,7 @@ const UI: React.FC = () => {
   return (
     <div className="ui-page">
       <h1>UI 페이지</h1>
+      <LNB children={[]} />
       <section>
         <h2>Drawer</h2>
         <Drawer title={"Open it!"} children={<div>Hello</div>} />

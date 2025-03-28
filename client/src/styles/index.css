@@ -56,11 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 */
 .main {
-  position: relative;
   width: 100vw;
   height: calc(100vh - 72px);
   padding-top: 72px;
   margin: 0;
+  display: flex;
 }
 
 .css_wrapper {

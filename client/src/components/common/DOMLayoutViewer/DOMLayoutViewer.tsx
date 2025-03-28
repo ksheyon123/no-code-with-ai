@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import Drawer from "../Drawer/Drawer";
 
 const DOMLayoutViewer: React.FC = () => {
@@ -42,16 +42,28 @@ const DOMLayoutViewer: React.FC = () => {
             {id}
           </div>
         </div>
-        <button
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "0",
-          }}
-        >
-          <FaTrash color="#ff6b6b" size={12} />
-        </button>
+        <div>
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "0",
+            }}
+          >
+            <FaEdit color="#ff6b6b" size={12} />
+          </button>
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "0",
+            }}
+          >
+            <FaTrash color="#ff6b6b" size={12} />
+          </button>
+        </div>
       </div>
     );
 

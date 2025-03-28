@@ -5,7 +5,7 @@ import UISelectModalFooter from "@/components/common/Modal/SubModalComponent/UIS
 import { useBlueprintContext } from "@/contexts/BlueprintContext";
 import { useModalContext } from "@/contexts/ModalContext";
 import { ElementGenerationParams } from "@/types";
-import DOMLayoutViewer from "@/components/common/DOMLayoutViewer/DOMLayoutViewer";
+import LNB from "@/components/common/LNB/LNB";
 
 const Main: React.FC = () => {
   const { initDomStructure } = useBlueprintContext();
@@ -72,7 +72,8 @@ const Main: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <div className="main">
+      <LNB children={<></>} />
       <div
         id="main_component"
         className="css_wrapper"
@@ -80,8 +81,7 @@ const Main: React.FC = () => {
       >
         <DOMRenderer />
       </div>
-      <DOMLayoutViewer />
-    </>
+    </div>
   );
 };
 
